@@ -332,7 +332,7 @@ impl ActorContext {
         self.deployment_project_id
     }
 
-    /// Keeps tenant-wide administrator grants inside a Lite installation.
+    /// Keeps tenant-wide administrator grants inside the fixed workspace.
     pub(crate) fn require_deployment_project(&self, project_id: Uuid) -> Result<(), AppError> {
         if self
             .deployment_project_id

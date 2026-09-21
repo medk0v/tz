@@ -9,7 +9,7 @@ use serde_json::{Value, json};
 use sqlx::{ConnectOptions, PgPool};
 use tower::ServiceExt;
 use tz_backend::{
-    AppState, Config, auth, bootstrap::create_lite_admin, config::ProductConfig, projects,
+    AppState, Config, auth, bootstrap::create_admin, config::ProductConfig, projects,
 };
 use uuid::Uuid;
 
@@ -99,7 +99,7 @@ async fn bootstrap(db: &PgPool) -> (Config, String, PathBuf) {
     let config = config(db);
     let path = credentials_path();
     assert!(
-        create_lite_admin(&config, "admin@example.test", &path)
+        create_admin(&config, "admin@example.test", &path)
             .await
             .unwrap()
     );
@@ -122,7 +122,7 @@ async fn bootstrap_preserves_demo_and_never_overwrites_credentials(db: PgPool) {
         0o600
     );
     assert!(
-        !create_lite_admin(&config, "admin@example.test", &path)
+        !create_admin(&config, "admin@example.test", &path)
             .await
             .unwrap()
     );
@@ -131,7 +131,7 @@ async fn bootstrap_preserves_demo_and_never_overwrites_credentials(db: PgPool) {
         .bind(config.product.project_id).fetch_one(&db).await.unwrap();
     assert_eq!(counts, (2, 3));
     assert!(
-        create_lite_admin(&config, "different@example.test", &credentials_path())
+        create_admin(&config, "different@example.test", &credentials_path())
             .await
             .is_err()
     );
@@ -145,7 +145,7 @@ async fn bootstrap_rolls_back_when_credentials_file_exists(db: PgPool) {
     let path = credentials_path();
     fs::write(&path, "keep this file").unwrap();
     assert!(
-        create_lite_admin(&config, "admin@example.test", &path)
+        create_admin(&config, "admin@example.test", &path)
             .await
             .is_err()
     );
@@ -343,7 +343,7 @@ async fn a_task_duration_is_not_offered(db: PgPool) {
         assert_eq!(status, StatusCode::BAD_REQUEST, "{body}");
     }
 
-    // Explicit nulls must not trip the gate: a Lite client may send the fields it never sets.
+    // Explicit nulls must not trip the gate: a client may send fields it never sets.
     let (plain, plain_body, _) = request(
         &app,
         Method::POST,

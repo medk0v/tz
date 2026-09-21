@@ -1,4 +1,4 @@
-//! First administrator and internal workspace provisioning for Lite binaries.
+//! First administrator and internal workspace provisioning.
 
 use std::{fs::OpenOptions, io::Write, os::unix::fs::OpenOptionsExt, path::Path};
 
@@ -14,19 +14,20 @@ use crate::{
     departments::{DepartmentDraft, insert_department},
 };
 
-/// Creates a fresh Lite workspace and administrator, saving the generated password
+/// Creates the fresh workspace and its administrator, saving the generated password
 /// to a new owner-only file. Repeated successful runs never rotate credentials.
 ///
 /// # Errors
 ///
-/// Rejects a non-Lite config, invalid email/path, a populated non-demo database,
+/// Rejects a config without a fixed project, an invalid email/path, a populated
+/// non-demo database,
 /// conflicting identity/project, or any database or credentials-file failure.
-pub async fn create_lite_admin(config: &Config, email: &str, credentials: &Path) -> Result<bool> {
+pub async fn create_admin(config: &Config, email: &str, credentials: &Path) -> Result<bool> {
     let project_id = config
         .product
         .fixed_project_id()
         .filter(|id| !id.is_nil())
-        .context("Lite product configuration with a non-nil project-id is required")?;
+        .context("product configuration with a non-nil project-id is required")?;
     let email = email.trim().to_lowercase();
     if email.is_empty()
         || email.len() > 320
@@ -45,10 +46,10 @@ pub async fn create_lite_admin(config: &Config, email: &str, credentials: &Path)
         .max_connections(1)
         .connect(&config.pg.url)
         .await
-        .context("failed to connect for Lite bootstrap")?;
+        .context("failed to connect for bootstrap")?;
     sqlx::migrate!("./migrations").run(&db).await?;
     let mut tx = db.begin().await?;
-    sqlx::query("SELECT pg_advisory_xact_lock(hashtextextended('tzomet-lite-bootstrap', 0))")
+    sqlx::query("SELECT pg_advisory_xact_lock(hashtextextended('workspace-bootstrap', 0))")
         .execute(&mut *tx)
         .await?;
     let initialized: bool = sqlx::query_scalar(
@@ -74,7 +75,7 @@ pub async fn create_lite_admin(config: &Config, email: &str, credentials: &Path)
     .fetch_one(&mut *tx)
     .await?;
     if populated {
-        bail!("Lite bootstrap requires a fresh database; existing non-demo records were found");
+        bail!("bootstrap requires a fresh database; existing non-demo records were found");
     }
 
     let mut random = [0u8; 32];

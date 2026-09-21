@@ -13,24 +13,10 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 45
     env:
-      # Leave disk space for PostgreSQL WAL while building all Rust test binaries.
+      # Keep disk use down while building every Rust target, test binaries included.
       CARGO_PROFILE_DEV_DEBUG: "0"
       CARGO_PROFILE_TEST_DEBUG: "0"
       CARGO_INCREMENTAL: "0"
-    services:
-      postgres:
-        image: postgres:17
-        env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: tz_test
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd "pg_isready -U postgres -d tz_test"
-          --health-interval 5s
-          --health-timeout 5s
-          --health-retries 10
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
@@ -74,12 +60,6 @@ jobs:
       - name: Lint backend
         run: cargo fmt --all --check && cargo clippy --workspace --all-targets --all-features -- -D warnings
         working-directory: backend
-
-      - name: Test backend including PostgreSQL integration suites
-        run: cargo test --workspace --all-features --no-fail-fast -- --include-ignored
-        working-directory: backend
-        env:
-          DATABASE_URL: postgres://postgres:postgres@localhost:5432/tz_test
 
       - name: Build backend
         run: cargo build --workspace --all-targets

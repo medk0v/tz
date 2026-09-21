@@ -30,35 +30,24 @@ describe("widget client context", () => {
     window.history.replaceState({}, "", "/");
   });
 
-  it("migrates a Lite visitor once so the existing contact keeps its chat history", async () => {
-    vi.stubEnv("VITE_PRODUCT_EDITION", "lite");
-    vi.resetModules();
-    const bridge = await import("./widget-bridge");
+  it("names no product in the visitor key and keeps the same visitor across visits", () => {
     const visitorId = "11111111-1111-4111-8111-111111111111";
-    const legacyKey = `tzomet-widget-visitor:${WIDGET_ID}`;
-    localStorage.setItem(legacyKey, visitorId);
-    expect(bridge.visitorStorageKey(WIDGET_ID)).toBe(`tz-widget-visitor:${WIDGET_ID}`);
-    expect(bridge.getOrCreateVisitorId(WIDGET_ID, localStorage, () => {
-      throw new Error("must preserve the visitor");
+    expect(visitorStorageKey(WIDGET_ID)).toBe(`widget-visitor:${WIDGET_ID}`);
+    expect(visitorStorageKey(WIDGET_ID)).not.toMatch(/tz|hinadex/i);
+    localStorage.setItem(visitorStorageKey(WIDGET_ID), visitorId);
+    expect(getOrCreateVisitorId(WIDGET_ID, localStorage, () => {
+      throw new Error("must reuse the stored visitor");
     })).toBe(visitorId);
-    expect(localStorage.getItem(bridge.visitorStorageKey(WIDGET_ID))).toBe(visitorId);
-    expect(localStorage.getItem(legacyKey)).toBeNull();
-    expect(bridge.getOrCreateVisitorId(WIDGET_ID, localStorage)).toBe(visitorId);
   });
 
-  it("keeps the legacy Lite visitor when storage prevents migration", async () => {
-    vi.stubEnv("VITE_PRODUCT_EDITION", "lite");
-    vi.resetModules();
-    const bridge = await import("./widget-bridge");
-    const visitorId = "11111111-1111-4111-8111-111111111111";
-    const removeItem = vi.fn();
+  it("creates an ephemeral visitor when storage is unavailable", () => {
     const storage = {
-      getItem: (key: string) => key.startsWith("tzomet-") ? visitorId : null,
+      getItem: () => null,
       setItem: () => { throw new Error("storage denied"); },
-      removeItem,
+      removeItem: () => undefined,
     } as unknown as Storage;
-    expect(bridge.getOrCreateVisitorId(WIDGET_ID, storage)).toBe(visitorId);
-    expect(removeItem).not.toHaveBeenCalled();
+    const created = getOrCreateVisitorId(WIDGET_ID, storage, () => "11111111-1111-4111-8111-111111111111");
+    expect(created).toBe("11111111-1111-4111-8111-111111111111");
   });
 
   it("keeps page query and hash out of context while preserving allowlisted attribution", () => {

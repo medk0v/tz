@@ -69,7 +69,8 @@ export interface WidgetBootstrapErrorMessage {
   message: string;
 }
 
-const VISITOR_STORAGE_PREFIX = `${productNamespace}-widget-visitor`;
+// Names nothing about the product: the visitor sees this key in their own browser.
+const VISITOR_STORAGE_PREFIX = "widget-visitor";
 const LEGACY_WIDGET_BORDER_RADIUS = 20;
 const LEGACY_WIDGET_LAUNCHER_ANIMATION = "pulse";
 const LEGACY_WIDGET_LAUNCHER_INTERVAL_SECONDS = 5;
@@ -323,15 +324,6 @@ export function getOrCreateVisitorId(
     const key = visitorStorageKey(widgetId);
     const existing = target.getItem(key);
     if (existing && UUID_V4_PATTERN.test(existing)) return existing;
-    // Preserve the contact and chat history of a visitor stored under the old key.
-    const legacyKey = `tzomet-widget-visitor:${widgetId}`;
-    const legacyId = target.getItem(legacyKey);
-    if (legacyId && UUID_V4_PATTERN.test(legacyId)) {
-      generatedId = legacyId;
-      target.setItem(key, legacyId);
-      target.removeItem(legacyKey);
-      return legacyId;
-    }
     generatedId = createId();
     target.setItem(key, generatedId);
     return generatedId;

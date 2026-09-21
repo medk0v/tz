@@ -436,7 +436,7 @@ where
 }
 
 impl TaskRequest {
-    /// Employees, boards and tags are unavailable in the Lite edition.
+    /// Employees, boards and tags are not part of this product.
     fn uses_board_features(&self) -> bool {
         self.assignee_ids
             .as_ref()

@@ -1,7 +1,7 @@
 use std::path::PathBuf;
 
 use anyhow::{Context, Result, bail};
-use tz_backend::{Config, bootstrap::create_lite_admin};
+use tz_backend::{Config, bootstrap::create_admin};
 
 #[tokio::main]
 async fn main() -> Result<()> {
@@ -33,7 +33,7 @@ async fn main() -> Result<()> {
     }
     let config = Config::from_file(config.context("--config is required")?)?;
     let credentials = credentials.context("--credentials is required")?;
-    let created = create_lite_admin(
+    let created = create_admin(
         &config,
         &email.context("--email is required")?,
         &credentials,
@@ -42,9 +42,9 @@ async fn main() -> Result<()> {
     println!(
         "{}",
         if created {
-            "Lite administrator created; credentials saved to the requested owner-only file"
+            "Administrator created; credentials saved to the requested owner-only file"
         } else {
-            "Lite administrator already initialized; credentials unchanged"
+            "Administrator already initialized; credentials unchanged"
         }
     );
     Ok(())
