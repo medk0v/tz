@@ -2,6 +2,10 @@ name: Deploy Lite
 
 on:
   workflow_dispatch:
+  workflow_run:
+    workflows: ["CI"]
+    types: [completed]
+    branches: ["master"]
 
 permissions:
   contents: read
@@ -13,15 +17,22 @@ concurrency:
 
 jobs:
   verify:
+    # An automatic run starts only after CI succeeded for a master push;
+    # a manual run keeps working exactly as before.
+    if: >-
+      github.event_name != 'workflow_run' ||
+      (github.event.workflow_run.conclusion == 'success' &&
+       github.event.workflow_run.event == 'push')
     runs-on: ubuntu-latest
     timeout-minutes: 5
     env:
-      RELEASE_SHA: ${{ github.sha }}
+      RELEASE_SHA: ${{ github.event.workflow_run.head_sha || github.sha }}
+      RELEASE_BRANCH: ${{ github.event.workflow_run.head_branch || github.ref_name }}
     steps:
       - name: Require the master branch
         run: |
-          if [ "${GITHUB_REF}" != refs/heads/master ]; then
-            echo '::error::Choose master when running Deploy Lite.'
+          if [ "${RELEASE_BRANCH}" != master ]; then
+            echo '::error::Deploy Lite runs only for master.'
             exit 1
           fi
 
@@ -62,11 +73,12 @@ jobs:
     runs-on: ${{ fromJSON(vars.TZ_LITE_BUILD_RUNNER || '"ubuntu-24.04-arm"') }}
     timeout-minutes: 180
     env:
-      RELEASE_SHA: ${{ github.sha }}
+      RELEASE_SHA: ${{ github.event.workflow_run.head_sha || github.sha }}
     steps:
       - name: Check out release on the build machine
         uses: actions/checkout@v4
         with:
+          ref: ${{ env.RELEASE_SHA }}
           persist-credentials: false
 
       - name: Set up ARM64 build environment
@@ -81,7 +93,7 @@ jobs:
       - name: Save application artifact
         uses: actions/upload-artifact@v4
         with:
-          name: lite-app-${{ github.sha }}
+          name: lite-app-${{ env.RELEASE_SHA }}
           path: ${{ runner.temp }}/lite-release/*
           if-no-files-found: error
           retention-days: 14
@@ -91,12 +103,13 @@ jobs:
     runs-on: ${{ fromJSON(vars.TZ_LITE_BUILD_RUNNER || '"ubuntu-24.04-arm"') }}
     timeout-minutes: 180
     env:
-      RELEASE_SHA: ${{ github.sha }}
+      RELEASE_SHA: ${{ github.event.workflow_run.head_sha || github.sha }}
       COMPOSE_PARALLEL_LIMIT: '1'
     steps:
       - name: Check out AI build inputs
         uses: actions/checkout@v4
         with:
+          ref: ${{ env.RELEASE_SHA }}
           persist-credentials: false
 
       - name: Release unused SDK space on the ephemeral GitHub runner
@@ -120,7 +133,7 @@ jobs:
       - name: Save AI runtime artifact
         uses: actions/upload-artifact@v4
         with:
-          name: lite-ai-${{ github.sha }}
+          name: lite-ai-${{ env.RELEASE_SHA }}
           path: ${{ runner.temp }}/lite-ai-release/*
           if-no-files-found: error
           compression-level: 0
@@ -132,20 +145,20 @@ jobs:
     environment: lite
     timeout-minutes: 60
     env:
-      RELEASE_SHA: ${{ github.sha }}
+      RELEASE_SHA: ${{ github.event.workflow_run.head_sha || github.sha }}
       DEPLOY_HOST: ${{ secrets.TZ_LITE_DEPLOY_HOST }}
       DEPLOY_USER: ${{ secrets.TZ_LITE_DEPLOY_USER }}
     steps:
       - name: Download compiled release
         uses: actions/download-artifact@v4
         with:
-          name: lite-app-${{ github.sha }}
+          name: lite-app-${{ env.RELEASE_SHA }}
           path: release
 
       - name: Download precompiled AI runtime
         uses: actions/download-artifact@v4
         with:
-          name: lite-ai-${{ github.sha }}
+          name: lite-ai-${{ env.RELEASE_SHA }}
           path: release
 
       - name: Configure Lite deployment identity

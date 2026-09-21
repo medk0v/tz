@@ -25,11 +25,16 @@ services, Redis pub/sub, cookies and browser storage. The deployment account is
 `tz-deploy`; runtime services are `tz-api`, `tz-worker` and `tz-redis`.
 Its encryption key is saved as `TZ_SECRETS_KEY` in `/etc/tz/tz.env`.
 
-## Manual delivery
+## Delivery
 
-`Deploy Lite` has only `workflow_dispatch`. In GitHub, open **Actions → Deploy Lite
-→ Run workflow**, select `master`, and run. The selected commit must already have
-a successful push CI run. A push alone never deploys Lite.
+`Deploy Lite` starts on its own as soon as the `CI` workflow completes
+successfully for a push to `master`, and it releases that exact commit rather than
+whatever the branch head happens to be. A CI run that failed, or one from a pull
+request, is skipped before any build starts.
+
+It can still be started by hand: open **Actions → Deploy Lite → Run workflow**,
+select `master`, and run. The selected commit must already have a successful push
+CI run.
 
 Application artifacts include the committed `GeoLite2-City.mmdb` and
 `GeoLite2-Country.mmdb` databases. Both are required and covered by manifest
