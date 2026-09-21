@@ -166,10 +166,30 @@ jobs:
           SSH_PRIVATE_KEY: ${{ secrets.TZ_LITE_DEPLOY_SSH_KEY }}
           SSH_HOST_KEY: ${{ secrets.TZ_LITE_SSH_HOST_KEY }}
         run: |
-          test "${DEPLOY_HOST}" = '65.109.95.170'
-          test "${DEPLOY_USER}" = 'tz-deploy'
-          test -n "${SSH_PRIVATE_KEY}"
-          printf '%s\n' "${SSH_HOST_KEY}" | grep -Eq '^ssh-ed25519 [A-Za-z0-9+/=]+$'
+          # Drop the stray whitespace a paste into the secret box leaves behind, then
+          # name the offending entry. A value is never printed, only its secret name.
+          DEPLOY_HOST="$(printf '%s' "${DEPLOY_HOST}" | tr -d '[:space:]')"
+          DEPLOY_USER="$(printf '%s' "${DEPLOY_USER}" | tr -d '[:space:]')"
+          SSH_HOST_KEY="$(printf '%s' "${SSH_HOST_KEY}" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')"
+          if [ "${DEPLOY_HOST}" != '65.109.95.170' ]; then
+            echo '::error::TZ_LITE_DEPLOY_HOST must hold exactly 65.109.95.170.'
+            exit 1
+          fi
+          if [ "${DEPLOY_USER}" != 'tz-deploy' ]; then
+            echo '::error::TZ_LITE_DEPLOY_USER must hold exactly tz-deploy.'
+            exit 1
+          fi
+          if [ -z "${SSH_PRIVATE_KEY}" ]; then
+            echo '::error::TZ_LITE_DEPLOY_SSH_KEY is empty.'
+            exit 1
+          fi
+          if ! printf '%s\n' "${SSH_HOST_KEY}" | grep -Eq '^ssh-ed25519 [A-Za-z0-9+/=]+$'; then
+            echo '::error::TZ_LITE_SSH_HOST_KEY must be a single "ssh-ed25519 <base64>" line, without the hostname or a trailing comment.'
+            exit 1
+          fi
+          # Later steps build the scp/ssh target from these, so hand them the trimmed pair.
+          printf 'DEPLOY_HOST=%s\n' "${DEPLOY_HOST}" >> "${GITHUB_ENV}"
+          printf 'DEPLOY_USER=%s\n' "${DEPLOY_USER}" >> "${GITHUB_ENV}"
           install -m 0700 -d ~/.ssh
           printf '%s\n' "${SSH_PRIVATE_KEY}" > ~/.ssh/tz-lite-deploy
           chmod 0600 ~/.ssh/tz-lite-deploy
