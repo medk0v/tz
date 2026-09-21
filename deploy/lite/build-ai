@@ -90,7 +90,6 @@ def main():
         combined.write_text(wrapper_source.replace(wrapper_from, wrapper_from + " AS tz-wrappers")
                             + "\n" + plugin_source.replace(plugin_from, "FROM tz-wrappers"))
         shutil.copyfile(LITE / "bake-firecrawl-plugin.mjs", openclaw_source / "bake-firecrawl-plugin.mjs")
-        shutil.copyfile(LITE / "install-neutral-commands.mjs", openclaw_source / "install-neutral-commands.mjs")
         for dockerfile, tag, build_args in (
             (combined, gateway, ["--build-arg", f"OPENCLAW_BASE_IMAGE={OPENCLAW_BASE}"]),
             (openclaw_source / "Dockerfile.browser", browser, []),
