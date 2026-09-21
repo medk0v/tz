@@ -1,0 +1,98 @@
+name: CI
+
+on:
+  push:
+    branches: ["master"]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      # Leave disk space for PostgreSQL WAL while building all Rust test binaries.
+      CARGO_PROFILE_DEV_DEBUG: "0"
+      CARGO_PROFILE_TEST_DEBUG: "0"
+      CARGO_INCREMENTAL: "0"
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: tz_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d tz_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy,rustfmt
+
+      - name: Cache Rust artifacts
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: backend -> target
+
+      - name: Install frontend dependencies
+        run: npm ci
+        working-directory: frontend
+
+      - name: Test OpenClaw capability wrappers
+        run: node --test infra/openclaw/bin/*.test.mjs
+
+      - name: Test isolated headless browser
+        run: bash infra/openclaw/test-browser.sh
+
+      - name: Test deployment tooling
+        run: python3 -m unittest discover -s deploy/lite -p 'test_*.py'
+
+      - name: Verify generated API client
+        run: |
+          npm run generate:client
+          git diff --exit-code -- src/api-schema.d.ts
+        working-directory: frontend
+
+      - name: Lint backend
+        run: cargo fmt --all --check && cargo clippy --workspace --all-targets --all-features -- -D warnings
+        working-directory: backend
+
+      - name: Test backend including PostgreSQL integration suites
+        run: cargo test --workspace --all-features --no-fail-fast -- --include-ignored
+        working-directory: backend
+        env:
+          DATABASE_URL: postgres://postgres:postgres@localhost:5432/tz_test
+
+      - name: Build backend
+        run: cargo build --workspace --all-targets
+        working-directory: backend
+
+      - name: Lint frontend
+        run: npm run lint
+        working-directory: frontend
+
+      - name: Test frontend
+        run: npm run test
+        working-directory: frontend
+
+      - name: Build frontend
+        run: npm run build
+        working-directory: frontend

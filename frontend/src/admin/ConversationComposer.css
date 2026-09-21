@@ -1,0 +1,103 @@
+.conversation-composer.message-composer {
+  min-width: 0;
+  padding: 14px 20px 16px;
+}
+
+.conversation-composer.message-composer > .conversation-composer-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 9px;
+}
+
+.conversation-composer-heading .message-composer-label {
+  min-width: 0;
+  margin: 0;
+  color: var(--text);
+  font-weight: 650;
+}
+
+.conversation-composer-channel {
+  min-width: 0;
+  max-width: 60%;
+  color: var(--text-secondary);
+  font-size: 12px;
+}
+
+.conversation-composer-channel .conversation-channel-label {
+  max-width: 100%;
+}
+
+.conversation-composer.message-composer > .chat-message-editor,
+.conversation-composer.message-composer > .message-editor-loading {
+  display: block;
+  width: 100%;
+}
+
+.conversation-composer .chat-rich-editor .chat-rich-editor-content {
+  min-height: 100px;
+}
+
+.conversation-composer.message-composer > .conversation-composer-visitor-draft {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-rows: auto;
+  align-items: start;
+  gap: 8px;
+  height: auto;
+  min-height: 0;
+  margin: 0 0 10px;
+  padding: 6px 8px;
+}
+
+.conversation-composer-visitor-draft .visitor-live-draft-label {
+  line-height: 18px;
+}
+
+.conversation-composer-visitor-draft .visitor-live-draft-text {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  font-size: 12px;
+  line-height: 18px;
+}
+
+.conversation-composer-footer {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.conversation-composer-footer .message-editor-hint {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  line-height: 1.45;
+}
+
+.conversation-composer-footer .message-attachment-button,
+.conversation-composer-footer .message-send-button {
+  margin: 0;
+}
+
+.conversation-composer-footer .message-send-button {
+  margin-left: auto;
+}
+
+@media (max-width: 600px) {
+  .conversation-composer.message-composer {
+    padding: 12px;
+  }
+
+  .conversation-composer-footer {
+    gap: 8px;
+  }
+
+  .conversation-composer.message-composer > .conversation-composer-visitor-draft {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2px;
+  }
+}

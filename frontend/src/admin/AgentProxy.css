@@ -1,0 +1,4 @@
+.ai-credentials.agent-proxy-settings { padding: 12px; }
+.agent-proxy-settings > p { margin: 0; color: var(--text-muted); }
+.agent-proxy-settings > label:has(input[type="checkbox"]) { display: flex; align-items: center; gap: 8px; }
+.agent-proxy-settings input[type="checkbox"] { width: auto; min-height: auto; }

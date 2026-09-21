@@ -1,0 +1,50 @@
+.note-share-dialog { width: min(620px, calc(100vw - 32px)); max-height: calc(100dvh - 48px); padding: 0; border: 1px solid var(--border-strong); border-radius: 9px; background: var(--surface); color: var(--text); overflow: auto; }
+.note-share-dialog::backdrop { background: rgb(0 0 0 / .42); }
+.note-share-dialog > header { display: flex; align-items: flex-start; gap: 18px; justify-content: space-between; padding: 22px 24px 18px; border-bottom: 1px solid var(--border); }
+.note-share-dialog h2 { margin: 0 0 6px; font-size: 19px; font-weight: 650; }
+.note-share-dialog header p { margin: 0; font-size: 12px; line-height: 1.5; color: var(--text-secondary); overflow-wrap: anywhere; }
+.note-share-icon { display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; flex-shrink: 0; padding: 0; border: 0; border-radius: 5px; background: transparent; color: var(--text-secondary); }
+.note-share-icon:hover:not(:disabled) { background: var(--surface-subtle); }
+.note-share-body { padding: 20px 24px 24px; }
+.note-share-help { color: var(--text-secondary); font-size: 13px; line-height: 1.6; margin: 0 0 18px; }
+.note-share-form { display: grid; gap: 15px; }
+.note-share-form > label:not(.note-share-edit) { display: grid; gap: 7px; color: var(--text); font-size: 13px; }
+.note-share-form > label > input:not([type="checkbox"]) { width: 100%; min-width: 0; min-height: 36px; padding: 7px 10px; border: 1px solid var(--border-strong); border-radius: 6px; background: var(--surface); color: var(--text); }
+.note-share-form label > span { color: var(--text-muted); font-size: 12px; line-height: 1.5; }
+.note-share-edit { display: flex; align-items: center; gap: 9px; font-size: 13px; }
+.note-share-edit input { accent-color: var(--accent); width: 16px; height: 16px; }
+.note-share-edit-help { margin: -7px 0 0 25px; color: var(--text-muted); font-size: 12px; line-height: 1.5; }
+.note-share-form .primary-button { justify-self: start; display: inline-flex; gap: 7px; align-items: center; }
+.note-share-theme-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; min-width: 0; }
+.note-share-theme-fields > div { display: grid; gap: 7px; min-width: 0; font-size: 13px; }
+.note-share-theme-fields .preference-dropdown { width: 100%; min-width: 0; }
+.note-share-pages { min-width: 0; margin: 0; padding: 14px; border: 1px solid var(--border); border-radius: 6px; }
+.note-share-pages legend { padding: 0 5px; font-size: 13px; font-weight: 600; }
+.note-share-pages-help { margin: 10px 0 0; color: var(--text-muted); font-size: 12px; line-height: 1.5; }
+.note-share-page-tree { max-height: 260px; overflow: auto; margin-top: 10px; }
+.note-share-page-tree:empty { display: none; }
+.note-share-page-tree ul { list-style: none; margin: 0; padding: 0; }
+.note-share-page-tree ul ul { margin-left: 8px; padding-left: 16px; border-left: 1px solid var(--border); }
+.note-share-page-tree label { display: flex; gap: 8px; align-items: flex-start; padding: 5px 0; font-size: 13px; }
+.note-share-page-tree label > span { color: var(--text); font-size: inherit; overflow-wrap: anywhere; }
+.note-share-page-tree input { width: 16px; height: 16px; flex-shrink: 0; margin: 2px 0 0; accent-color: var(--accent); }
+.note-share-settings-heading { display: flex; align-items: center; gap: 12px; justify-content: space-between; }
+.note-share-settings-heading h3 { margin: 0; font-size: 14px; font-weight: 600; overflow-wrap: anywhere; }
+.note-share-link-actions { display: flex; align-items: center; gap: 5px; }
+.note-share-link-actions > .secondary-button { display: inline-flex; align-items: center; gap: 5px; padding: 6px 8px; font-size: 12px; }
+.note-share-error { padding: 10px 12px; border: 1px solid var(--danger-border); border-radius: 5px; color: var(--danger); font-size: 13px; }
+.note-share-links { margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--border); }
+.note-share-links ul { margin: 0; padding: 0; list-style: none; }
+.note-share-links li { min-width: 0; padding: 0 0 18px; }
+.note-share-links li + li { padding-top: 18px; border-top: 1px solid var(--border); }
+.note-share-links li:last-child { padding-bottom: 0; }
+.note-share-link-heading { display: flex; justify-content: space-between; gap: 10px; align-items: center; }
+.note-share-link-heading strong { font-size: 13px; font-weight: 600; overflow-wrap: anywhere; }
+.note-share-link-details { display: flex; flex-wrap: wrap; align-items: center; gap: 7px 14px; color: var(--text-muted); font-size: 11px; margin: 2px 0 10px; }
+.note-share-link-details span { display: inline-flex; align-items: center; gap: 4px; }
+.note-share-revoke { color: var(--danger); }
+.note-share-url { display: flex; min-width: 0; gap: 7px; }
+.note-share-url input { flex: 1; min-width: 0; padding: 8px; border: 1px solid var(--border); border-radius: 5px; background: var(--surface-subtle); color: var(--text-secondary); font-size: 12px; }
+.note-share-url button { display: inline-flex; align-items: center; gap: 5px; padding: 7px 9px; white-space: nowrap; font-size: 12px; }
+.note-share-secret-hint { margin: 8px 0 0; color: var(--text-muted); font-size: 11px; line-height: 1.5; }
+@media (max-width: 600px) { .note-share-dialog > header, .note-share-body { padding: 18px; }.note-share-url button span { display: none; }.note-share-dialog { max-height: calc(100dvh - 24px); }.note-share-theme-fields { grid-template-columns: 1fr; } }

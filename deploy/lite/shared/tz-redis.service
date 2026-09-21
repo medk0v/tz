@@ -1,0 +1,39 @@
+[Unit]
+Description=TZ private Redis pub/sub
+After=network.target
+
+[Service]
+Type=notify
+User=redis
+Group=redis
+RuntimeDirectory=tz-redis
+RuntimeDirectoryMode=0750
+ExecStart=/usr/bin/redis-server /etc/redis/tz.conf --supervised systemd
+Restart=on-failure
+RestartSec=3s
+TimeoutStartSec=30s
+TimeoutStopSec=30s
+UMask=0027
+LimitNOFILE=65536
+NoNewPrivileges=true
+PrivateDevices=true
+PrivateTmp=true
+ProtectClock=true
+ProtectControlGroups=true
+ProtectHome=true
+ProtectHostname=true
+ProtectKernelLogs=true
+ProtectKernelModules=true
+ProtectKernelTunables=true
+ProtectSystem=strict
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+RestrictNamespaces=true
+LockPersonality=true
+MemoryDenyWriteExecute=true
+CapabilityBoundingSet=
+AmbientCapabilities=
+ReadWritePaths=/var/lib/tz/redis /run/tz-redis
+ReadOnlyPaths=/etc/redis/tz.conf /etc/redis/tz-users.acl
+
+[Install]
+WantedBy=multi-user.target

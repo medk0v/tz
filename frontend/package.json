@@ -1,0 +1,72 @@
+{
+  "name": "tz-frontend",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Support workspace frontend",
+  "scripts": {
+    "dev": "vite --mode admin --port 5173",
+    "dev:admin": "vite --mode admin --port 5173",
+    "dev:widget": "vite --mode widget --port 5174 --open /widget.html",
+    "generate:client": "openapi-typescript ../backend/openapi/openapi.yaml -o src/api-schema.d.ts",
+    "lint": "eslint .",
+    "test:admin": "vitest run --mode admin",
+    "test:widget": "vitest run --mode widget",
+    "test": "npm run test:admin && npm run test:widget",
+    "build:admin": "vite build --mode admin",
+    "build:widget": "vite build --mode widget && vite build --mode loader",
+    "build": "npm run generate:client && tsc -b && npm run build:admin && npm run build:widget",
+    "preview:admin": "vite preview --outDir dist/admin",
+    "preview:widget": "vite preview --outDir dist/widget"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "overrides": {
+    "@mdxeditor/editor": {
+      "js-yaml": "^4.3.1"
+    },
+    "@redocly/openapi-core": {
+      "js-yaml": "^4.3.0",
+      "minimatch": "^10.2.6"
+    }
+  },
+  "dependencies": {
+    "@fontsource-variable/manrope": "^5.3.0",
+    "@lexical/rich-text": "0.48.0",
+    "@mdxeditor/editor": "^4.2.0",
+    "@mdxeditor/gurx": "1.2.4",
+    "@sentry/browser": "^10.69.0",
+    "lexical": "0.48.0",
+    "lucide-react": "^0.468.0",
+    "openapi-fetch": "^0.14.0",
+    "preact": "^10.25.4",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "react-markdown": "^10.1.0",
+    "react-router": "^8.4.0",
+    "remark-gfm": "^4.0.1"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@preact/preset-vite": "^2.9.3",
+    "@sentry/vite-plugin": "^5.4.0",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/preact": "^3.2.4",
+    "@testing-library/react": "^16.3.2",
+    "@types/node": "^22.10.5",
+    "@types/react": "^19.0.3",
+    "@types/react-dom": "^19.0.2",
+    "@vitejs/plugin-react": "^4.3.4",
+    "eslint": "^10.8.0",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "eslint-plugin-react-refresh": "^0.4.16",
+    "globals": "^15.14.0",
+    "jsdom": "^29.1.1",
+    "openapi-typescript": "^7.8.0",
+    "typescript": "^5.7.2",
+    "typescript-eslint": "^8.20.0",
+    "vite": "^6.0.5",
+    "vitest": "^4.1.10"
+  }
+}

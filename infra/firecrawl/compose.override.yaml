@@ -1,0 +1,62 @@
+services:
+  api:
+    ports: !override
+      - "127.0.0.1:3002:3002"
+    networks:
+      backend:
+      support-ai:
+        aliases:
+          - firecrawl-api
+    depends_on:
+      nuq-postgres:
+        condition: service_healthy
+    cpus: 2.0
+    mem_limit: 4G
+    memswap_limit: 4G
+    restart: unless-stopped
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - -e
+        - "fetch('http://127.0.0.1:3002/v0/health/readiness').then((response)=>process.exit(response.ok?0:1)).catch(()=>process.exit(1))"
+      interval: 20s
+      timeout: 5s
+      retries: 6
+      start_period: 45s
+
+  playwright-service:
+    cpus: 1.5
+    mem_limit: 2G
+    memswap_limit: 2G
+    restart: unless-stopped
+
+  redis:
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  rabbitmq:
+    restart: unless-stopped
+
+  nuq-postgres:
+    restart: unless-stopped
+    volumes:
+      - firecrawl-postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+networks:
+  support-ai:
+    name: support-ai
+    external: true
+
+volumes:
+  firecrawl-postgres:
+

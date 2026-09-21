@@ -1,0 +1,84 @@
+# Operating system files
+.DS_Store
+._*
+.Spotlight-V100/
+.Trashes/
+Thumbs.db
+Desktop.ini
+
+# IDEs and editors
+.idea/
+.fleet/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.example.json
+*.swp
+*.swo
+*~
+
+# Secrets and machine-local configuration
+.env
+.env.*
+!**/.env.example
+!**/.env.*.example
+.envrc
+.direnv/
+/backend/Config*.toml
+!/backend/Config.example.toml
+*.key
+*.pem
+*.p12
+*.pfx
+*.jks
+
+# Rust build and profiling output
+target/
+*.rs.bk
+*.profraw
+*.profdata
+
+# Node.js, Vite, and test output
+node_modules/
+dist/
+coverage/
+.vite/
+.vitest/
+.nyc_output/
+.eslintcache
+*.tsbuildinfo
+lcov.info
+
+# Stale TypeScript-emitted copies can shadow the source Vite config
+/frontend/vite.config.js
+/frontend/vite.config.d.ts
+
+# Logs and runtime state
+*.log
+*.log.*
+*.pid
+*.pid.lock
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Private attachment objects
+/backend/data/attachments/
+
+# Customer knowledge-base exports, instructions, and production backups
+/docs/ai/*/
+
+# Temporary files and local databases
+.cache/
+.tmp/
+tmp/
+temp/
+*.tmp
+*.bak
+*.orig
+*.rej
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite3

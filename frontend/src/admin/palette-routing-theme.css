@@ -1,0 +1,101 @@
+/* Routing workbench on light/dark cabinet surfaces for every palette except ocean (which keeps its dark canvas). */
+:root:is([data-palette="graphite"], [data-palette="forest"], [data-palette="plum"], [data-palette="copper"], [data-palette="paper"], [data-palette="ink"]) .routing-workbench {
+  --routing-bg: var(--surface-subtle);
+  --routing-panel: var(--surface);
+  --routing-panel-raised: var(--surface-subtle);
+  --routing-panel-selected: color-mix(in srgb, var(--pal-tint-color) var(--pal-tint), var(--surface));
+  --routing-border: var(--border);
+  --routing-border-strong: var(--border-strong);
+  --routing-text: var(--text);
+  --routing-text-secondary: var(--text-secondary);
+  --routing-muted: var(--text-muted);
+  --routing-accent: var(--accent);
+  --routing-mint: var(--accent);
+  --routing-danger: var(--danger);
+  --routing-connector: var(--border-strong);
+  --routing-connector-active: var(--accent);
+  --routing-field: var(--surface);
+  --routing-field-hover: var(--surface-strong);
+  --routing-on-accent: var(--on-accent);
+  box-shadow: 0 2px 8px var(--shadow);
+}
+
+:root:is([data-palette="graphite"], [data-palette="forest"], [data-palette="plum"], [data-palette="copper"], [data-palette="paper"], [data-palette="ink"]) :is(.routing-workbench-toolbar, .routing-inspector > header, .routing-routing-owner-note) {
+  background: var(--surface-subtle);
+}
+
+:root:is([data-palette="graphite"], [data-palette="forest"], [data-palette="plum"], [data-palette="copper"], [data-palette="paper"], [data-palette="ink"]) :is(.routing-inspector, .routing-related-list > button) {
+  background: var(--surface);
+}
+
+:root:is([data-palette="graphite"], [data-palette="forest"], [data-palette="plum"], [data-palette="copper"], [data-palette="paper"], [data-palette="ink"]) .routing-workbench :is(input, select, textarea) {
+  background: var(--surface);
+}
+
+:root:is([data-palette="graphite"], [data-palette="forest"], [data-palette="plum"], [data-palette="copper"], [data-palette="paper"], [data-palette="ink"]) .routing-workbench :is(input, textarea)::placeholder {
+  color: var(--routing-muted);
+}
+
+:root:is([data-palette="graphite"], [data-palette="forest"], [data-palette="plum"], [data-palette="copper"], [data-palette="paper"], [data-palette="ink"]) .routing-workbench .primary-button {
+  border-color: var(--pal-primary-border);
+  background: var(--pal-primary);
+  color: var(--pal-on-primary);
+}
+
+:root:is([data-palette="graphite"], [data-palette="forest"], [data-palette="plum"], [data-palette="copper"], [data-palette="paper"], [data-palette="ink"]) .routing-workbench .primary-button:hover:not(:disabled) {
+  border-color: var(--pal-primary-border-hover);
+  background: var(--pal-primary-hover);
+}
+
+:root:is([data-palette="graphite"], [data-palette="forest"], [data-palette="plum"], [data-palette="copper"], [data-palette="paper"], [data-palette="ink"]) .routing-workbench :is(.secondary-button, .routing-icon-button) {
+  background: var(--surface);
+}
+
+:root:is([data-palette="graphite"], [data-palette="forest"], [data-palette="plum"], [data-palette="copper"], [data-palette="paper"], [data-palette="ink"]) .routing-workbench .secondary-button:hover:not(:disabled) {
+  border-color: var(--routing-accent);
+  background: var(--surface-strong);
+}
+
+:root:is([data-palette="graphite"], [data-palette="forest"], [data-palette="plum"], [data-palette="copper"], [data-palette="paper"], [data-palette="ink"]) .routing-workbench .routing-delete-button,
+:root:is([data-palette="graphite"], [data-palette="forest"], [data-palette="plum"], [data-palette="copper"], [data-palette="paper"], [data-palette="ink"]) .routing-workbench .routing-delete-button:hover:not(:disabled) {
+  color: var(--routing-danger);
+}
+
+:root:is([data-palette="graphite"], [data-palette="forest"], [data-palette="plum"], [data-palette="copper"], [data-palette="paper"], [data-palette="ink"]) .routing-canvas {
+  background-image: radial-gradient(circle, var(--border) 1px, transparent 1.25px);
+}
+
+:root:is([data-palette="graphite"], [data-palette="forest"], [data-palette="plum"], [data-palette="copper"], [data-palette="paper"], [data-palette="ink"]) .routing-canvas::after {
+  background: none;
+}
+
+:root:is([data-palette="graphite"], [data-palette="forest"], [data-palette="plum"], [data-palette="copper"], [data-palette="paper"], [data-palette="ink"]) .routing-node {
+  box-shadow: 0 1px 3px var(--shadow);
+}
+
+:root:is([data-palette="graphite"], [data-palette="forest"], [data-palette="plum"], [data-palette="copper"], [data-palette="paper"], [data-palette="ink"]) .routing-node::before,
+:root:is([data-palette="graphite"], [data-palette="forest"], [data-palette="plum"], [data-palette="copper"], [data-palette="paper"], [data-palette="ink"]) .routing-node::after {
+  border-color: var(--routing-border-strong);
+}
+
+:root:is([data-palette="graphite"], [data-palette="forest"], [data-palette="plum"], [data-palette="copper"], [data-palette="paper"], [data-palette="ink"]) .routing-node:hover {
+  border-color: var(--routing-border-strong);
+}
+
+:root:is([data-palette="graphite"], [data-palette="forest"], [data-palette="plum"], [data-palette="copper"], [data-palette="paper"], [data-palette="ink"]) :is(.routing-node--selected, .routing-node--selected:hover) {
+  border-color: var(--routing-accent);
+  box-shadow: 0 0 0 1px var(--routing-accent);
+}
+
+:root:is([data-palette="graphite"], [data-palette="forest"], [data-palette="plum"], [data-palette="copper"], [data-palette="paper"], [data-palette="ink"]) .routing-node > svg {
+  color: var(--routing-text-secondary);
+}
+
+:root:is([data-palette="graphite"], [data-palette="forest"], [data-palette="plum"], [data-palette="copper"], [data-palette="paper"], [data-palette="ink"]) .routing-node--selected > svg {
+  color: var(--routing-accent);
+}
+
+:root:is([data-palette="graphite"], [data-palette="forest"], [data-palette="plum"], [data-palette="copper"], [data-palette="paper"], [data-palette="ink"]) .routing-node-members > i {
+  background: var(--surface-strong);
+  color: var(--text-secondary);
+}

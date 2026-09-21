@@ -1,0 +1,56 @@
+.team-workspace { display: grid; gap: 16px; min-width: 0; }
+.team-tabs { display: flex; gap: 20px; border-bottom: 1px solid var(--border); min-width: 0; overflow-x: auto; }
+.team-tabs > button { flex: 0 0 auto; border: 0; border-bottom: 2px solid transparent; border-radius: 0; background: transparent; color: var(--text-secondary); padding: 12px 0; font-size: 13px; }
+.team-tabs > button[aria-current="page"] { border-bottom-color: var(--accent); color: var(--text); font-weight: 600; }
+.team-tabs > button:hover { color: var(--text); }
+.team-section { min-width: 0; }
+.team-section > header, .team-position-heading { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.team-section h2, .team-position-heading h2 { margin: 0; font-size: 16px; }
+.team-section > header .secondary-button, .team-table .secondary-button, .team-kpi-heading .secondary-button { min-height: 32px; padding: 6px 10px; font-size: 12px; }
+.team-table-scroll { min-width: 0; overflow-x: auto; }
+.team-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 13px; }
+.team-table th, .team-table td { padding: 12px 14px; border-bottom: 1px solid var(--border); vertical-align: top; }
+.team-table th { font-weight: 500; color: var(--text-secondary); }
+.team-table td { overflow-wrap: anywhere; }
+.team-table tr:last-child td { border-bottom: 0; }
+.team-table select { min-width: 180px; width: 100%; max-width: 320px; }
+.team-text-button, .team-back-button { background: transparent; border: 0; border-radius: 0; padding: 0; color: var(--text); text-align: left; }
+.team-text-button { font-weight: 600; }
+.team-text-button:hover, .team-back-button:hover { color: var(--accent); }
+.team-back-button { display: flex; align-items: center; gap: 6px; font-size: 12px; margin-bottom: 12px; color: var(--text-secondary); }
+.job-position-editor { min-width: 0; }
+.job-position-editor > .team-tabs { padding: 0 18px; }
+.team-editor-body { padding: 18px; min-width: 0; }
+.team-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; padding: 0; border: 0; margin: 0; min-width: 0; }
+.team-fields label { display: flex; flex-direction: column; gap: 6px; color: var(--text-secondary); font-size: 13px; min-width: 0; }
+.team-fields input, .team-fields select, .team-fields textarea { width: 100%; min-width: 0; }
+.team-fields textarea, .team-kpi-table textarea { resize: vertical; }
+.team-field-wide { grid-column: 1 / -1; }
+.team-help { margin: 10px 0; color: var(--text-muted); font-size: 12px; line-height: 1.6; }
+.team-readonly-help { padding: 0 14px; }
+.team-generation-action { display: flex; align-items: end; }
+.team-kpi-heading { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin: 20px 0 12px; }
+.team-kpi-heading h3 { margin: 0; font-size: 14px; }
+.team-kpi-table { min-width: 1040px; table-layout: fixed; }
+.team-kpi-table th, .team-kpi-table td { padding: 8px; }
+.team-kpi-table th:last-child { width: 44px; }
+.team-kpi-table th:nth-child(2) { width: 22%; }
+.team-kpi-table textarea { display: block; width: 100%; min-height: 92px; padding: 8px; font-size: 12px; line-height: 1.5; }
+.team-icon-button { display: inline-grid; place-items: center; width: 28px; height: 32px; padding: 0; background: transparent; border: 0; color: var(--text-secondary); }
+.team-icon-button:hover { color: var(--danger); }
+.team-approved { border-top: 1px solid var(--border); margin-top: 24px; }
+.team-approved-table { min-width: 840px; }
+.team-approved-table td { white-space: pre-wrap; }
+.team-approved-table th, .team-approved-table td { padding: 10px 8px; }
+.team-editor-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; }
+.team-editor-body > .admin-notice { margin-top: 16px; }
+.team-section > .admin-notice { margin: 14px; }
+.team-load-error { padding: 18px; }
+.team-sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+@media (max-width: 720px) {
+  .team-tabs { gap: 16px; }
+  .team-fields { grid-template-columns: minmax(0, 1fr); }
+  .team-section > header { align-items: flex-start; flex-wrap: wrap; }
+  .team-section > .team-table-scroll > .team-table { min-width: 600px; }
+  .team-editor-body { padding: 14px; }
+}

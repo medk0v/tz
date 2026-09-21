@@ -1,0 +1,926 @@
+.routing-page {
+  min-width: 0;
+}
+
+.content[data-page-width="full"]:has(> .routing-page) {
+  padding: 0;
+  overflow: auto;
+  background: var(--surface);
+}
+
+.content[data-page-width="full"] > .routing-page {
+  min-height: 100%;
+  max-width: none;
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+}
+
+.content[data-page-width="full"] .routing-page > .page-toolbar {
+  min-height: 72px;
+  flex: 0 0 auto;
+  align-items: center;
+  margin: 0;
+  padding: 14px 24px;
+  background: var(--surface);
+}
+
+.content[data-page-width="full"] .routing-page > .admin-notice {
+  flex: 0 0 auto;
+  margin: 8px 16px;
+}
+
+.content[data-page-width="full"] .routing-page > .empty-state {
+  min-height: 0;
+  flex: 1 1 auto;
+}
+
+.content[data-page-width="full"] .routing-workbench {
+  min-height: 0;
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.content[data-page-width="full"] .routing-workbench-body {
+  min-height: 0;
+  flex: 1 1 auto;
+}
+
+.content[data-page-width="full"] .routing-canvas {
+  min-height: 0;
+}
+
+.content[data-page-width="full"] .routing-inspector {
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.content[data-page-width="full"] .routing-workbench-loading {
+  min-height: 0;
+  flex: 1 1 auto;
+}
+
+.routing-page > .admin-notice {
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.routing-page > .admin-notice .secondary-button {
+  min-height: 30px;
+  flex: 0 0 auto;
+  padding: 0 9px;
+}
+
+.routing-workbench {
+  --routing-bg: #0c1a26;
+  --routing-panel: #102435;
+  --routing-panel-raised: #142b3e;
+  --routing-panel-selected: #18344a;
+  --routing-border: #29455b;
+  --routing-border-strong: #3b5d73;
+  --routing-text: #ecf5fa;
+  --routing-text-secondary: #b8cad5;
+  --routing-muted: #7f98aa;
+  --routing-accent: #789aff;
+  --routing-mint: #72dfb4;
+  --routing-danger: #ff947c;
+  --routing-connector: #38566c;
+  --routing-connector-active: #85a2ff;
+  --routing-field: #0d1f2e;
+  --routing-field-hover: #18344a;
+  --routing-on-accent: #091725;
+  min-width: 0;
+  min-height: 580px;
+  overflow: hidden;
+  border: 1px solid var(--routing-border);
+  border-radius: 9px;
+  background: var(--routing-bg);
+  color: var(--routing-text);
+  box-shadow: 0 6px 20px rgba(7, 18, 28, .18);
+}
+
+.routing-workbench-toolbar {
+  min-height: 62px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 20px;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--routing-border);
+  background: #102334;
+}
+
+.routing-workbench-toolbar > label:first-child {
+  min-width: 190px;
+  display: grid;
+  gap: 4px;
+}
+
+.routing-workbench-toolbar > label:first-child > span,
+.routing-inspector-fields > label > span {
+  color: var(--routing-muted);
+  font-size: 11px;
+  font-weight: 680;
+  letter-spacing: .045em;
+  text-transform: uppercase;
+}
+
+.routing-workbench input,
+.routing-workbench select,
+.routing-workbench textarea {
+  border-color: var(--routing-border-strong);
+  background: #0d1f2e;
+  color: var(--routing-text);
+}
+
+.routing-workbench input::placeholder,
+.routing-workbench textarea::placeholder {
+  color: #607b8e;
+}
+
+.routing-workbench .primary-button {
+  border-color: var(--routing-accent);
+  background: var(--routing-accent);
+  color: #091725;
+}
+
+.routing-workbench .secondary-button {
+  border-color: var(--routing-border-strong);
+  background: #122a3c;
+  color: var(--routing-text-secondary);
+}
+
+.routing-workbench .secondary-button:hover:not(:disabled) {
+  border-color: #5d7d91;
+  background: #19364b;
+  color: var(--routing-text);
+}
+
+.routing-workbench-toolbar > .routing-toggle-row {
+  flex: 1 1 250px;
+  max-width: 290px;
+}
+
+.routing-workbench-toolbar > .routing-toggle-row > span > span {
+  white-space: nowrap;
+}
+
+.routing-toolbar-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 7px;
+  margin-left: auto;
+}
+
+.routing-toolbar-actions > button {
+  min-height: 34px;
+  padding: 0 11px;
+}
+
+.routing-toolbar-help {
+  max-width: 190px;
+  color: var(--routing-muted);
+  font-size: 11px;
+  line-height: 1.35;
+}
+
+.routing-workbench-body {
+  min-width: 0;
+  min-height: 516px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 318px;
+}
+
+.routing-canvas {
+  position: relative;
+  min-width: 0;
+  min-height: 516px;
+  overflow: auto;
+  isolation: isolate;
+  background-color: var(--routing-bg);
+  background-image: radial-gradient(circle, rgba(112, 145, 166, .24) 1px, transparent 1.25px);
+  background-position: 1px 1px;
+  background-size: 18px 18px;
+}
+
+.routing-canvas::after {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(520px circle at 54% 5%, rgba(105, 145, 255, .09), transparent 68%);
+  content: "";
+}
+
+.routing-canvas > canvas {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.routing-graph-columns {
+  position: relative;
+  z-index: 1;
+  min-width: 790px;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(152px, 1fr));
+  gap: clamp(28px, 4vw, 58px);
+  align-items: start;
+  padding: 24px 26px 42px;
+}
+
+.routing-graph-column {
+  min-width: 0;
+}
+
+.routing-graph-column > h2 {
+  min-height: 22px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin: 0 0 15px;
+  color: var(--routing-muted);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.routing-graph-column > h2 svg {
+  color: var(--routing-mint);
+}
+
+.routing-node-list {
+  display: grid;
+  gap: 12px;
+}
+
+.routing-node {
+  position: relative;
+  width: 100%;
+  min-height: 68px;
+  display: grid;
+  grid-template-columns: 25px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 9px;
+  padding: 11px;
+  border: 1px solid var(--routing-border);
+  border-radius: 7px;
+  background: var(--routing-panel);
+  color: var(--routing-text);
+  box-shadow: 0 4px 12px rgba(1, 10, 18, .18);
+  text-align: left;
+  transition: border-color 140ms ease, background-color 140ms ease, translate 120ms ease;
+}
+
+.routing-node::before,
+.routing-node::after {
+  position: absolute;
+  top: 50%;
+  width: 7px;
+  height: 7px;
+  border: 1px solid #527088;
+  border-radius: 50%;
+  background: var(--routing-bg);
+  content: "";
+  translate: 0 -50%;
+}
+
+.routing-node::before { left: -5px; }
+.routing-node::after { right: -5px; }
+
+.routing-graph-column:first-child .routing-node::before,
+.routing-graph-column:last-child .routing-node::after {
+  display: none;
+}
+
+.routing-node:hover {
+  border-color: #55748a;
+  background: var(--routing-panel-raised);
+  translate: 0 -1px;
+}
+
+.routing-node:focus-visible {
+  outline-color: var(--routing-accent);
+}
+
+.routing-node--selected,
+.routing-node--selected:hover {
+  border-color: var(--routing-accent);
+  background: var(--routing-panel-selected);
+  box-shadow: 0 0 0 1px rgba(120, 154, 255, .14), 0 6px 16px rgba(2, 10, 18, .28);
+}
+
+.routing-node--selected > svg {
+  color: var(--routing-mint);
+}
+
+.routing-node--muted {
+  opacity: .58;
+}
+
+.routing-node > svg {
+  color: #91abc0;
+}
+
+.routing-node-copy {
+  min-width: 0;
+  display: grid;
+  gap: 3px;
+}
+
+.routing-node-copy > strong,
+.routing-node-copy > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.routing-node-copy > strong {
+  color: var(--routing-text);
+  font-size: 13px;
+  font-weight: 670;
+}
+
+.routing-node-copy > span {
+  color: var(--routing-muted);
+  font-size: 11px;
+}
+
+.routing-node-members {
+  display: flex;
+  flex-direction: row-reverse;
+  padding-left: 5px;
+}
+
+.routing-node-members > i {
+  width: 21px;
+  height: 21px;
+  display: grid;
+  place-items: center;
+  margin-left: -5px;
+  border: 2px solid var(--routing-panel);
+  border-radius: 50%;
+  background: #29485d;
+  color: #dceaf2;
+  font-size: 8px;
+  font-style: normal;
+  font-weight: 720;
+}
+
+.routing-column-empty {
+  margin: 0;
+  padding: 10px 4px;
+  color: var(--routing-muted);
+  font-size: 11px;
+}
+
+.routing-inspector {
+  min-width: 0;
+  border-left: 1px solid var(--routing-border);
+  background: #102231;
+}
+
+.routing-inspector > header {
+  min-height: 64px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 13px 14px;
+  border-bottom: 1px solid var(--routing-border);
+  background: #112638;
+}
+
+.routing-inspector > header > div {
+  min-width: 0;
+  display: grid;
+  gap: 2px;
+}
+
+.routing-inspector > header span {
+  color: var(--routing-muted);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+}
+
+.routing-inspector > header h2 {
+  overflow: hidden;
+  margin: 0;
+  color: var(--routing-text);
+  font-size: 15px;
+  font-weight: 680;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.routing-inspector > header em {
+  flex: 0 0 auto;
+  padding: 3px 6px;
+  border: 1px solid var(--routing-border);
+  border-radius: 4px;
+  color: var(--routing-muted);
+  font-size: 10px;
+  font-style: normal;
+}
+
+.routing-inspector-fields {
+  display: grid;
+  gap: 13px;
+  padding: 14px;
+}
+
+.routing-inspector-content {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.routing-inspector-fields > label {
+  min-width: 0;
+  display: grid;
+  gap: 5px;
+}
+
+.routing-field-help,
+.routing-related-list p,
+.routing-operator-list p,
+.routing-interval-list > p,
+.routing-inspector-empty {
+  margin: 0;
+  color: var(--routing-muted);
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+.routing-inspector-empty {
+  padding: 22px 14px;
+}
+
+.routing-toggle-list {
+  display: grid;
+  border-top: 1px solid var(--routing-border);
+}
+
+.routing-toggle-row {
+  min-width: 0;
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  color: var(--routing-text);
+}
+
+.routing-toggle-list > .routing-toggle-row {
+  padding: 10px 0;
+  border-bottom: 1px solid var(--routing-border);
+}
+
+.routing-toggle-row > input {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 auto;
+  margin: 2px 0 0;
+  accent-color: var(--routing-accent);
+}
+
+.routing-toggle-row > span {
+  min-width: 0;
+  display: grid;
+  gap: 2px;
+}
+
+.routing-toggle-row > span > strong {
+  color: var(--routing-text);
+  font-size: 12px;
+  font-weight: 670;
+}
+
+.routing-toggle-row > span > span {
+  color: var(--routing-muted);
+  font-size: 10px;
+  line-height: 1.4;
+}
+
+.routing-inspector-summary {
+  margin: 0;
+  display: grid;
+  gap: 8px;
+}
+
+.routing-inspector-summary > div {
+  display: grid;
+  grid-template-columns: 90px minmax(0, 1fr);
+  gap: 10px;
+}
+
+.routing-inspector-summary dt {
+  color: var(--routing-muted);
+  font-size: 11px;
+}
+
+.routing-inspector-summary dd {
+  color: var(--routing-text-secondary);
+  font-size: 11px;
+}
+
+.routing-related-list {
+  display: grid;
+  gap: 6px;
+  padding-top: 12px;
+  border-top: 1px solid var(--routing-border);
+}
+
+.routing-related-list > strong,
+.routing-interval-heading > strong {
+  color: var(--routing-text-secondary);
+  font-size: 11px;
+  font-weight: 680;
+}
+
+.routing-related-list > button {
+  padding: 7px 8px;
+  overflow: hidden;
+  border: 1px solid var(--routing-border);
+  border-radius: 5px;
+  background: #0d1f2e;
+  color: var(--routing-text-secondary);
+  font-size: 11px;
+  text-align: left;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.routing-operator-list {
+  min-width: 0;
+  display: grid;
+  margin: 0;
+  padding: 0;
+  border: 1px solid var(--routing-border);
+  border-radius: 6px;
+}
+
+.routing-operator-list legend {
+  margin-left: 8px;
+  padding: 0 5px;
+  color: var(--routing-muted);
+  font-size: 10px;
+  font-weight: 680;
+}
+
+.routing-operator-list > label {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: 16px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+  border-bottom: 1px solid var(--routing-border);
+}
+
+.routing-operator-list > label:last-of-type {
+  border-bottom: 0;
+}
+
+.routing-operator-list input {
+  width: 15px;
+  height: 15px;
+  margin: 0;
+  accent-color: var(--routing-accent);
+}
+
+.routing-operator-list label > span {
+  min-width: 0;
+  display: grid;
+}
+
+.routing-operator-list strong,
+.routing-operator-list label > span > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.routing-operator-list strong {
+  color: var(--routing-text);
+  font-size: 11px;
+}
+
+.routing-operator-list label > span > span,
+.routing-operator-list em {
+  color: var(--routing-muted);
+  font-size: 10px;
+  font-style: normal;
+}
+
+.routing-operator-list > p {
+  padding: 10px;
+}
+
+.routing-unavailable-members {
+  display: grid;
+  gap: 7px;
+  padding: 9px;
+  border-top: 1px solid var(--routing-border);
+}
+
+.routing-unavailable-members > p,
+.routing-routing-owner-note {
+  margin: 0;
+  color: var(--routing-muted);
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+.routing-routing-owner-note {
+  padding: 9px 10px;
+  border: 1px solid var(--routing-border);
+  border-radius: 6px;
+  background: #0d1f2e;
+  color: var(--routing-text-secondary);
+}
+
+.routing-unavailable-members > div {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 34px;
+  align-items: center;
+  gap: 7px;
+}
+
+.routing-unavailable-members code {
+  overflow: hidden;
+  color: var(--routing-text-secondary);
+  font-size: 10px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.routing-rule-actions {
+  display: flex;
+  gap: 6px;
+  padding-top: 4px;
+}
+
+.routing-rule-actions > button {
+  min-height: 32px;
+  padding: 0 9px;
+}
+
+.routing-rule-actions > .routing-delete-button {
+  margin-left: auto;
+}
+
+.routing-delete-button,
+.routing-delete-button:hover:not(:disabled) {
+  color: var(--routing-danger);
+}
+
+.routing-inspector-fields > .routing-delete-button {
+  justify-self: start;
+  min-height: 32px;
+  padding: 0 10px;
+}
+
+.routing-interval-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.routing-interval-heading .secondary-button {
+  min-height: 34px;
+  padding: 0 8px;
+  font-size: 11px;
+}
+
+.routing-interval-list {
+  display: grid;
+  gap: 6px;
+}
+
+.routing-interval-row {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: minmax(78px, 1fr) 72px 72px 34px;
+  gap: 5px;
+}
+
+.routing-interval-row select,
+.routing-interval-row input {
+  min-width: 0;
+  height: 32px;
+  padding: 0 5px;
+  font-size: 11px;
+}
+
+/* DateTimeField reads the cabinet tokens; here it has to follow the workbench canvas instead, popover included. */
+.routing-interval-row .routing-interval-time {
+  --date-time-field-height: 32px;
+  --date-time-field-padding-inline: 5px;
+  --date-time-field-font-size: 11px;
+  --surface: var(--routing-field);
+  --surface-subtle: var(--routing-panel-raised);
+  --surface-strong: var(--routing-field-hover);
+  --border: var(--routing-border-strong);
+  --border-strong: var(--routing-border-strong);
+  --text: var(--routing-text);
+  --text-secondary: var(--routing-text-secondary);
+  --text-muted: var(--routing-muted);
+  --accent: var(--routing-accent);
+  --on-accent: var(--routing-on-accent);
+  --danger: var(--routing-danger);
+}
+
+/* "10:30 PM" does not fit the column next to the clock icon. */
+.routing-interval-row .routing-interval-time[data-hour-cycle="h12"] .date-time-field-trigger > svg {
+  display: none;
+}
+
+.routing-icon-button {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 1px solid var(--routing-border-strong);
+  border-radius: 5px;
+  background: #122a3c;
+  color: var(--routing-danger);
+}
+
+.routing-workbench-loading {
+  min-height: 516px;
+  display: grid;
+  place-items: center;
+  padding: 28px;
+  color: var(--routing-muted);
+  font-size: 12px;
+  text-align: center;
+}
+
+@media (max-width: 1180px) {
+  .routing-workbench-body {
+    grid-template-columns: minmax(0, 1fr) 292px;
+  }
+
+  .routing-graph-columns {
+    gap: 34px;
+    padding-right: 22px;
+    padding-left: 22px;
+  }
+}
+
+@media (max-width: 920px) {
+  .content[data-page-width="full"]:has(> .routing-page) {
+    overflow: auto;
+  }
+
+  .content[data-page-width="full"] > .routing-page {
+    height: auto;
+  }
+
+  .content[data-page-width="full"] .routing-workbench {
+    min-height: 580px;
+    flex: 0 0 auto;
+  }
+
+  .routing-workbench-toolbar {
+    align-items: flex-end;
+    flex-wrap: wrap;
+  }
+
+  .routing-workbench-toolbar > .routing-toggle-row {
+    flex: 1 1 240px;
+  }
+
+  .routing-toolbar-actions {
+    flex: 1 1 100%;
+    justify-content: flex-end;
+  }
+
+  .routing-workbench-body {
+    grid-template-columns: 1fr;
+  }
+
+  .routing-inspector {
+    border-top: 1px solid var(--routing-border);
+    border-left: 0;
+  }
+
+  .routing-inspector-fields {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .routing-inspector-fields > .routing-toggle-list,
+  .routing-inspector-fields > .routing-routing-owner-note,
+  .routing-inspector-fields > .routing-field-help,
+  .routing-inspector-fields > .routing-operator-list,
+  .routing-inspector-fields > .routing-related-list,
+  .routing-inspector-fields > .routing-interval-heading,
+  .routing-inspector-fields > .routing-interval-list,
+  .routing-inspector-fields > .routing-rule-actions,
+  .routing-inspector-fields > .routing-delete-button,
+  .routing-inspector-fields > .routing-toggle-row,
+  .routing-inspector-fields > .routing-inspector-summary {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 680px) {
+  .routing-workbench {
+    min-height: 0;
+  }
+
+  .routing-workbench-toolbar {
+    display: grid;
+    grid-template-columns: 1fr;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .routing-workbench-toolbar > label:first-child,
+  .routing-workbench-toolbar > .routing-toggle-row {
+    max-width: none;
+  }
+
+  .routing-workbench-toolbar > .routing-toggle-row > span > span {
+    white-space: normal;
+  }
+
+  .routing-toolbar-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    margin: 0;
+  }
+
+  .routing-toolbar-help {
+    max-width: none;
+    grid-column: 1 / -1;
+  }
+
+  .routing-toolbar-actions > .primary-button {
+    grid-column: 1 / -1;
+  }
+
+  .routing-canvas {
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .routing-graph-columns {
+    min-width: 0;
+    grid-template-columns: 1fr;
+    gap: 26px;
+    padding: 20px 20px 34px;
+  }
+
+  .routing-node::before,
+  .routing-node::after {
+    top: auto;
+    left: 50%;
+    right: auto;
+    translate: -50% 0;
+  }
+
+  .routing-node::before { top: -5px; }
+  .routing-node::after { bottom: -5px; }
+
+  .routing-graph-column:first-child .routing-node::before {
+    display: block;
+  }
+
+  .routing-graph-column:first-child .routing-node-list > .routing-node:first-child::before,
+  .routing-graph-column:last-child .routing-node-list > .routing-node:last-child::after {
+    display: none;
+  }
+
+  .routing-inspector-fields {
+    grid-template-columns: 1fr;
+  }
+
+  .routing-inspector-fields > * {
+    grid-column: 1;
+  }
+
+  .routing-interval-row {
+    /* 72px is the narrowest a time field shows "HH:mm" next to its icon without an ellipsis. */
+    grid-template-columns: minmax(74px, 1fr) 72px 72px 34px;
+    gap: 4px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .routing-node {
+    transition: none;
+  }
+}

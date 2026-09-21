@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+[[ "${RENEWED_LINEAGE:-}" == /etc/letsencrypt/live/tz.cyber-money.org ]] || exit 0
+/usr/sbin/nginx -t
+/usr/bin/systemctl reload nginx.service

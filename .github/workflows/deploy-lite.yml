@@ -1,0 +1,199 @@
+name: Deploy Lite
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: tz-lite
+  cancel-in-progress: false
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      RELEASE_SHA: ${{ github.sha }}
+    steps:
+      - name: Require the master branch
+        run: |
+          if [ "${GITHUB_REF}" != refs/heads/master ]; then
+            echo '::error::Choose master when running Deploy Lite.'
+            exit 1
+          fi
+
+      - name: Require successful CI for this exact master commit
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          echo "Checking push CI for master commit ${RELEASE_SHA} on the GitHub-hosted runner."
+          if ! runs="$(gh api --method GET "repos/${GH_REPO}/actions/workflows/ci.yml/runs" \
+            -f head_sha="${RELEASE_SHA}" -f branch=master -f event=push -f per_page=100 \
+            --jq '.workflow_runs')"; then
+            echo '::error::Could not read CI runs from GitHub. See the API error above; this step requires actions: read.'
+            exit 1
+          fi
+          matching_runs="$(jq --arg sha "${RELEASE_SHA}" \
+            '[.[] | select(.head_sha == $sha and .head_branch == "master" and .event == "push")]' \
+            <<< "$runs")"
+          jq -r '.[] | "CI: \(.status) / \(.conclusion // "pending") — \(.html_url)"' <<< "$matching_runs"
+          if jq -e 'any(.[]; .status == "completed" and .conclusion == "success")' \
+            <<< "$matching_runs" >/dev/null; then
+            echo 'Successful CI found for the selected commit. Lite build is allowed.'
+            exit 0
+          fi
+          if jq -e 'length == 0' <<< "$matching_runs" >/dev/null; then
+            echo "::error::No push CI run was found for master commit ${RELEASE_SHA}. Check Actions > CI, then run Deploy Lite again after CI succeeds."
+          elif jq -e 'any(.[]; .status != "completed")' <<< "$matching_runs" >/dev/null; then
+            echo '::error::CI is still queued or running. Wait for the linked CI run to succeed, then use Re-run failed jobs on this Deploy Lite run.'
+          else
+            echo '::error::CI did not succeed for this commit. Open the linked CI run and fix or rerun CI before retrying Deploy Lite.'
+          fi
+          exit 1
+
+  build:
+    needs: verify
+    # Optional repository variable: JSON runner label or self-hosted label array.
+    # The Lite application server must never be registered as this build runner.
+    runs-on: ${{ fromJSON(vars.TZ_LITE_BUILD_RUNNER || '"ubuntu-24.04-arm"') }}
+    timeout-minutes: 180
+    env:
+      RELEASE_SHA: ${{ github.sha }}
+    steps:
+      - name: Check out release on the build machine
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Set up ARM64 build environment
+        uses: docker/setup-buildx-action@v3
+
+      - name: Check artifact validation
+        run: python3 -m unittest discover -s deploy/lite -p 'test_*.py'
+
+      - name: Build compiled application release
+        run: bash deploy/lite/build-release "${RELEASE_SHA}" "${RUNNER_TEMP}/lite-release"
+
+      - name: Save application artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: lite-app-${{ github.sha }}
+          path: ${{ runner.temp }}/lite-release/*
+          if-no-files-found: error
+          retention-days: 14
+
+  build-ai:
+    needs: verify
+    runs-on: ${{ fromJSON(vars.TZ_LITE_BUILD_RUNNER || '"ubuntu-24.04-arm"') }}
+    timeout-minutes: 180
+    env:
+      RELEASE_SHA: ${{ github.sha }}
+      COMPOSE_PARALLEL_LIMIT: '1'
+    steps:
+      - name: Check out AI build inputs
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Release unused SDK space on the ephemeral GitHub runner
+        if: runner.environment == 'github-hosted'
+        run: |
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /usr/local/share/powershell
+          df -h /
+
+      - name: Set up isolated AI builder
+        id: buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build precompiled AI images and runtime bundle
+        env:
+          AI_BUILDER: ${{ steps.buildx.outputs.name }}
+          BUILDX_BUILDER: ${{ steps.buildx.outputs.name }}
+        run: |
+          python3 deploy/lite/build-ai --release "${RELEASE_SHA}" \
+            --output-dir "${RUNNER_TEMP}/lite-ai-release" --prune-builder "${AI_BUILDER}"
+
+      - name: Save AI runtime artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: lite-ai-${{ github.sha }}
+          path: ${{ runner.temp }}/lite-ai-release/*
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 14
+
+  deploy:
+    needs: [build, build-ai]
+    runs-on: ubuntu-latest
+    environment: lite
+    timeout-minutes: 60
+    env:
+      RELEASE_SHA: ${{ github.sha }}
+      DEPLOY_HOST: ${{ secrets.TZ_LITE_DEPLOY_HOST }}
+      DEPLOY_USER: ${{ secrets.TZ_LITE_DEPLOY_USER }}
+    steps:
+      - name: Download compiled release
+        uses: actions/download-artifact@v4
+        with:
+          name: lite-app-${{ github.sha }}
+          path: release
+
+      - name: Download precompiled AI runtime
+        uses: actions/download-artifact@v4
+        with:
+          name: lite-ai-${{ github.sha }}
+          path: release
+
+      - name: Configure Lite deployment identity
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.TZ_LITE_DEPLOY_SSH_KEY }}
+          SSH_HOST_KEY: ${{ secrets.TZ_LITE_SSH_HOST_KEY }}
+        run: |
+          test "${DEPLOY_HOST}" = '65.109.95.170'
+          test "${DEPLOY_USER}" = 'tz-deploy'
+          test -n "${SSH_PRIVATE_KEY}"
+          printf '%s\n' "${SSH_HOST_KEY}" | grep -Eq '^ssh-ed25519 [A-Za-z0-9+/=]+$'
+          install -m 0700 -d ~/.ssh
+          printf '%s\n' "${SSH_PRIVATE_KEY}" > ~/.ssh/tz-lite-deploy
+          chmod 0600 ~/.ssh/tz-lite-deploy
+          printf '%s %s\n' "${DEPLOY_HOST}" "${SSH_HOST_KEY}" > ~/.ssh/known_hosts
+          chmod 0600 ~/.ssh/known_hosts
+
+      - name: Upload compiled files
+        run: |
+          cd release
+          for prefix in tz-lite tz-lite-ai; do
+            sha256sum --check "${prefix}-${RELEASE_SHA}.tar.gz.sha256"
+            for suffix in tar.gz tar.gz.sha256; do
+              scp -O -i ~/.ssh/tz-lite-deploy \
+                -o BatchMode=yes -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes \
+                -o ForwardAgent=no \
+                "${prefix}-${RELEASE_SHA}.${suffix}" \
+                "${DEPLOY_USER}@${DEPLOY_HOST}:/var/lib/tz/incoming/${prefix}-${RELEASE_SHA}.${suffix}"
+            done
+          done
+
+      - name: Activate compiled release
+        run: |
+          ssh -i ~/.ssh/tz-lite-deploy \
+            -o BatchMode=yes -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes \
+            -o ForwardAgent=no \
+            -o ServerAliveInterval=15 -o ServerAliveCountMax=3 \
+            "${DEPLOY_USER}@${DEPLOY_HOST}" \
+            "sudo -n /usr/local/sbin/tz-lite-deploy ${RELEASE_SHA}"
+
+      - name: Verify public Lite service
+        run: |
+          curl --fail --silent --show-error --retry 6 --retry-delay 5 --retry-all-errors \
+            --connect-timeout 10 --max-time 30 https://tz.cyber-money.org/health/ready
+          curl --fail --silent --show-error --retry 6 --retry-delay 5 --retry-all-errors \
+            --connect-timeout 10 --max-time 30 --output /dev/null \
+            "https://tz.cyber-money.org/?release=${RELEASE_SHA}"
+
+      - name: Remove temporary deployment key
+        if: always()
+        run: rm -f ~/.ssh/tz-lite-deploy

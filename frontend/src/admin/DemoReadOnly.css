@@ -1,0 +1,45 @@
+.demo-notice {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: flex-start;
+  gap: 11px;
+  min-width: 0;
+  padding: 12px 15px;
+  border: 1px solid color-mix(in srgb, var(--accent) 25%, var(--border));
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--accent) 7%, var(--surface));
+  color: var(--text-secondary);
+  font-size: 13px;
+  line-height: 1.55;
+}
+.demo-notice-icon { flex: 0 0 19px; margin-top: 1px; color: var(--accent); }
+.demo-notice-content { min-width: 0; flex: 1; display: flex; flex-wrap: wrap; align-items: center; gap: 9px 22px; }
+.demo-notice-content p { flex: 1 1 480px; margin: 0; overflow-wrap: anywhere; }
+.demo-notice-content a, .demo-notice-content a:visited {
+  display: inline-flex;
+  flex: 0 1 auto;
+  align-items: center;
+  gap: 6px;
+  color: color-mix(in srgb, var(--accent) 85%, var(--text));
+  font-size: 12px;
+  font-weight: 650;
+  line-height: 1.5;
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, var(--accent) 40%, transparent);
+  text-underline-offset: 3px;
+}
+.demo-notice-content a:hover { text-decoration-color: currentColor; }
+.demo-notice-content a:focus-visible { outline: 2px solid var(--focus); outline-offset: 4px; border-radius: 2px; }
+.demo-notice-content a svg { flex: 0 0 auto; }
+.workspace-demo-notice { flex: 0 0 auto; min-width: 0; padding: 16px 30px 0; overflow: hidden; scrollbar-gutter: stable; transition: padding 200ms ease; }
+.workspace:has(> .workspace-demo-notice) > .content { scrollbar-gutter: stable; }
+.workspace-demo-notice > .demo-notice { width: min(100%, 1500px); margin-inline: auto; transition: width 200ms ease; }
+.workspace-demo-notice[data-page-width="full"] { padding-inline: 24px; background: var(--surface); }
+.workspace-demo-notice[data-page-width="full"] > .demo-notice { width: 100%; }
+@media (prefers-reduced-motion: reduce) {
+  .workspace-demo-notice, .workspace-demo-notice > .demo-notice { transition: none; }
+}
+@media (max-width: 640px) {
+  .workspace-demo-notice, .workspace-demo-notice[data-page-width="full"] { padding: 12px 14px 0; }
+  .demo-notice { gap: 9px; padding: 11px 12px; font-size: 12px; }
+}

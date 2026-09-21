@@ -1,0 +1,31 @@
+.department-context { padding: 14px 16px; border-bottom: 1px solid var(--border); }
+.department-project-row { display: flex; align-items: center; gap: 9px; min-width: 0; }
+.department-project-row > svg { flex-shrink: 0; color: var(--text-muted); }
+.department-project-row > strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 14px; }
+.project-switcher { flex: 1; min-width: 0; }
+.project-switcher-notice { display: grid; gap: 6px; margin-top: 6px; color: var(--text-muted); font-size: 11px; overflow-wrap: anywhere; }
+.project-switcher-notice > button { justify-self: start; padding: 0; border: 0; background: transparent; color: var(--text); font: inherit; text-decoration: underline; cursor: pointer; }
+.project-switcher-notice > button:focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; }
+/* A menu wider than its trigger grows towards the workspace, never off the screen edge. */
+.shell[data-sidebar-position="right"] .project-switcher .preference-dropdown-options { inset-inline-start: auto; inset-inline-end: 0; }
+.department-switcher { display: grid; gap: 6px; margin-top: 12px; font-size: 11px; color: var(--text-muted); }
+.workspace-refresh-notice { flex: 0 0 auto; min-width: 0; padding: 16px 30px 0; overflow: hidden; scrollbar-gutter: stable; }
+.workspace:has(> .workspace-refresh-notice) > .content { scrollbar-gutter: stable; }
+.workspace-refresh-notice > .admin-notice { width: min(100%, 1500px); margin: 0 auto; }
+.workspace-refresh-notice[data-page-width="full"] { padding-inline: 24px; background: var(--surface); }
+.workspace-refresh-notice[data-page-width="full"] > .admin-notice { width: 100%; }
+@media (max-width: 640px) {
+  .workspace-refresh-notice, .workspace-refresh-notice[data-page-width="full"] { padding: 12px 14px 0; }
+}
+.department-workspace-message { display: flex; flex-direction: column; align-items: flex-start; gap: 12px; padding: 24px 0; color: var(--text-secondary); }
+.department-workspace-message p { margin: 0; }
+.sidebar--collapsed .department-context { padding: 12px 8px; }
+.sidebar--collapsed .department-project-row { justify-content: center; }
+.sidebar--collapsed .department-project-row > svg { display: none; }
+.sidebar--collapsed .department-project-row > strong { font-size: 10px; text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sidebar--collapsed .department-switcher > span { display: none; }
+/* The collapsed rail has room for a name and little else. */
+.sidebar--collapsed .department-context .preference-dropdown-trigger { height: 30px; gap: 2px; padding: 0 3px; font-size: 10px; }
+.sidebar--collapsed .department-context .preference-dropdown-trigger > svg { width: 10px; }
+.sidebar--collapsed .department-context .preference-dropdown-options { inset-inline: 0 auto; width: max-content; min-width: 100%; max-width: 200px; }
+@media (prefers-reduced-motion: reduce) { .department-context * { transition: none; } }

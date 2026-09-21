@@ -1,0 +1,18 @@
+.project-colors-note {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 11px;
+  line-height: 1.35;
+}
+
+.project-colors-note > svg { flex: 0 0 auto; }
+.project-colors-note--settings { margin-top: 3px; font-size: 12px; }
+
+/* The light and dark switch in the sidebar preferences while the project sets the mode. */
+.theme-switcher--locked .theme-option { cursor: default; }
+.theme-switcher--locked .theme-option:not(.theme-option--active) { opacity: .45; }
+.theme-switcher--locked .theme-option:hover { color: var(--text-muted); }
+.theme-switcher--locked .theme-option--active:hover { color: var(--text); }

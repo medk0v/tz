@@ -1,0 +1,19 @@
+FROM node:22-bookworm-slim
+
+WORKDIR /opt/support-browser
+COPY browser/package.json browser/package-lock.json ./
+RUN npm ci --omit=dev --ignore-scripts \
+    && npx playwright install --with-deps chromium \
+    && chmod -R a+rX /root/.cache/ms-playwright \
+    && mv /root/.cache/ms-playwright /opt/playwright \
+    && mkdir /run/support-browser \
+    && chown 1000:1000 /run/support-browser \
+    && chmod 0770 /run/support-browser \
+    && rm -rf /var/lib/apt/lists/* /root/.npm
+ENV PLAYWRIGHT_BROWSERS_PATH=/opt/playwright
+# Full Chrome needs writable Crashpad configuration and font caches under --read-only.
+ENV XDG_CONFIG_HOME=/tmp/chromium-config \
+    XDG_CACHE_HOME=/tmp/chromium-cache
+COPY bin/support-browser-runner.mjs bin/support-browser-protocol.mjs ./
+USER node
+CMD ["node", "support-browser-runner.mjs"]

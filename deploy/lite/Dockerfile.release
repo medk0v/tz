@@ -1,0 +1,50 @@
+# syntax=docker/dockerfile:1
+# This file runs on a build machine, never on the Lite application server.
+FROM rust:1.88-bookworm AS backend
+ARG RELEASE_SHA
+# Optional per-deployment obfuscation key: sets the compile-time keystream for
+# `obf!`-wrapped strings so each customer build differs. Empty keeps a fixed
+# (reproducible) keystream; still obfuscated, just not per-deployment unique.
+ARG TZ_OBFUSCATION_KEY=""
+ENV TZ_BUILD_ENVIRONMENT=production TZ_BUILD_RELEASE=${RELEASE_SHA} \
+    TZ_OBFUSCATION_KEY=${TZ_OBFUSCATION_KEY}
+WORKDIR /src/backend
+COPY backend/ ./
+# Agent runtime fingerprints embed the OpenClaw wrappers at compile time.
+COPY infra/openclaw/bin/ /src/infra/openclaw/bin/
+# Client / on-prem builds ship to a customer-controlled server, so harden the
+# binary (release-hardened: strip + fat LTO) and obfuscate sensitive string
+# literals so `strings` on the binary does not reveal prompts and safety
+# policies. Our own hosting build (deploy/server) stays on plain `--release`.
+RUN --mount=type=cache,target=/usr/local/cargo/registry \
+    --mount=type=cache,target=/usr/local/cargo/git \
+    --mount=type=cache,target=/src/backend/target \
+    cargo build --locked --profile release-hardened --features obfuscate \
+        --bin api --bin worker --bin bootstrap-admin \
+    && mkdir /binaries \
+    && cp target/release-hardened/api target/release-hardened/worker \
+        target/release-hardened/bootstrap-admin /binaries/
+
+FROM node:22-bookworm AS frontend
+WORKDIR /src/frontend
+COPY frontend/package.json frontend/package-lock.json ./
+RUN --mount=type=cache,target=/root/.npm npm ci --no-audit --no-fund
+COPY frontend/ ./
+COPY backend/openapi/ /src/backend/openapi/
+ARG RELEASE_SHA
+ENV VITE_PRODUCT_EDITION=lite \
+    VITE_ENTRY_MODE=login \
+    VITE_API_BASE_URL=https://tz.cyber-money.org \
+    VITE_WIDGET_API_BASE_URL=https://tz.cyber-money.org \
+    VITE_WIDGET_LOADER_URL=https://tz.cyber-money.org/loader/widget-loader.js \
+    VITE_WIDGET_FRAME_URL=https://tz.cyber-money.org/widget/widget.html \
+    VITE_SENTRY_ENVIRONMENT=production \
+    VITE_SENTRY_RELEASE=${RELEASE_SHA}
+RUN npm run build \
+    && rm -f dist/admin/demo.html dist/widget/demo.html dist/loader/demo.html
+
+FROM scratch AS release
+COPY --from=backend /binaries/ /bin/
+COPY --from=backend /src/backend/data/GeoLite2-City.mmdb /geoip/GeoLite2-City.mmdb
+COPY --from=backend /src/backend/data/GeoLite2-Country.mmdb /geoip/GeoLite2-Country.mmdb
+COPY --from=frontend /src/frontend/dist/ /frontend/

@@ -1,0 +1,97 @@
+.directory-page { min-width: 0; }
+.directory-page-table { min-width: 0; display: flex; flex-direction: column; }
+
+.content[data-page-width="full"]:has(> .directory-page) {
+  padding: 0;
+  overflow: auto;
+  background: var(--surface);
+}
+
+.content[data-page-width="full"] > .directory-page {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.content[data-page-width="full"] .directory-page-toolbar {
+  min-height: 72px;
+  flex: 0 0 auto;
+  align-items: center;
+  margin: 0;
+  padding: 14px 24px;
+  background: var(--surface);
+}
+
+.content[data-page-width="full"] .directory-page-toolbar h1 { font-size: 21px; }
+.content[data-page-width="full"] .directory-page > .admin-notice { flex: 0 0 auto; margin: 8px 16px; }
+
+.content[data-page-width="full"] .directory-page-table {
+  flex: 1 1 auto;
+  min-height: 0;
+  border: 0;
+  border-radius: 0;
+}
+
+.content[data-page-width="full"] .contacts-table-scroll,
+.content[data-page-width="full"] .online-visitors-table-scroll {
+  min-height: 0;
+  flex: 1 1 auto;
+  overflow: auto;
+}
+
+.content[data-page-width="full"] .directory-page-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--surface);
+}
+
+.content[data-page-width="full"] .contacts-table-scroll > .empty-state {
+  min-height: calc(100% - 47px);
+}
+
+.content[data-page-width="full"] .online-visitors-table:has(> .empty-state) .online-visitors-table-scroll {
+  flex: 0 0 auto;
+}
+
+.content[data-page-width="full"] .online-visitors-table > .empty-state {
+  min-height: 0;
+  flex: 1 1 auto;
+}
+
+.directory-page .table-pagination { flex: 0 0 auto; }
+
+@media (max-width: 640px) {
+  .content[data-page-width="full"] .directory-page-toolbar { align-items: stretch; padding: 12px 14px; }
+}
+
+.contacts-filters { display: flex; align-items: center; justify-content: flex-end; flex-wrap: wrap; gap: 12px; }
+.contacts-period-field select { min-width: 172px; height: 36px; }
+.contacts-date-range { display: flex; flex-wrap: wrap; gap: 8px; }
+.contacts-date-field { display: flex; align-items: center; gap: 6px; color: var(--text-secondary); font-size: 12px; }
+.contacts-date-field .date-time-field { flex: 0 0 auto; width: 168px; }
+.contacts-tabs { display: flex; gap: 24px; padding: 0 16px; border-bottom: 1px solid var(--border); flex: 0 0 auto; }
+.content:not([data-page-width="full"]) .contacts-page > .directory-page-toolbar { align-items: center; }
+.content:not([data-page-width="full"]) .contacts-tabs { margin-bottom: 14px; padding-inline: 0; }
+.contacts-tabs button { padding: 12px 0; border: 0; border-bottom: 2px solid transparent; background: transparent; color: var(--text-muted); font: inherit; font-size: 13px; }
+.contacts-tabs button[aria-selected="true"] { border-bottom-color: var(--accent); color: var(--text); font-weight: 600; }
+.contacts-range-notice { padding: 24px; color: var(--text-muted); }
+.contacts-statistics { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: start; gap: 20px; padding: 20px 16px; }
+.contacts-statistics td { text-align: right; font-variant-numeric: tabular-nums; }
+.contacts-statistics .contacts-country-statistics { max-height: 380px; overflow: auto; }
+.contacts-statistics-note { grid-column: 1 / -1; max-width: 900px; margin: 0; color: var(--text-muted); font-size: 12px; line-height: 1.6; }
+.contact-info-tooltip { position: fixed; z-index: 1000; width: 420px; max-width: calc(100vw - 80px); max-height: min(320px, calc(100vh - 24px)); overflow: auto; padding: 12px 16px; border: 1px solid var(--border-strong); border-radius: 6px; background: var(--surface); color: var(--text); box-shadow: 0 2px 8px #0002; font-size: 12px; line-height: 1.8; white-space: pre-wrap; overflow-wrap: anywhere; }
+@media (max-width: 900px) {
+  .contacts-page .directory-page-toolbar { flex-wrap: wrap; gap: 12px; }
+  .contacts-filters { justify-content: flex-start; }
+  .contacts-statistics { grid-template-columns: minmax(0, 1fr); }
+}
+
+.contacts-table .contact-identity .contact-blocked-badge { color: var(--danger); font-size: 12px; font-weight: 600; }
+.contact-block-control .field-error { margin: 6px 0 0; white-space: normal; }
+.contacts-table .contact-block-control, .contacts-table .contact-block-control button { white-space: normal; }
+.contact-block-control svg { flex-shrink: 0; }
+
+@media (max-width: 640px) {
+  .content:not([data-page-width="full"]) .contacts-page > .directory-page-toolbar { align-items: stretch; }
+}

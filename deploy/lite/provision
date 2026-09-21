@@ -1,0 +1,227 @@
+#!/usr/bin/env bash
+# Run from the configuration-only archive produced by package-provision.
+set -Eeuo pipefail
+umask 027
+fail() { echo "TZ Lite provision: $*" >&2; exit 1; }
+[[ "$EUID" -eq 0 ]] || fail "must run as root"
+[[ "$#" -le 1 ]] || fail "usage: provision [dedicated-deploy-public-key-file]"
+[[ "$(uname -m)" == aarch64 ]] || fail "expected the ARM64 Lite server"
+[[ -f /etc/os-release ]] || fail "Ubuntu is required"
+. /etc/os-release
+[[ "$ID" == ubuntu && "$VERSION_ID" == 26.04 ]] || fail "this installer targets Ubuntu 26.04"
+source_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+shared_dir="$source_dir/shared"
+[[ -d "$shared_dir" ]] || fail "use the configuration-only package-provision archive"
+# Refuse legacy installs before creating users, paths or a new database. Their
+# persisted state and encryption key must be moved by the explicit migration.
+for legacy_path in \
+    /etc/tzomet-lite-installation /etc/tzomet /srv/tzomet /srv/tzomet-ai \
+    /var/lib/tzomet /var/lib/tzomet-ai /var/lib/tzomet-deploy \
+    /usr/local/lib/tzomet /usr/local/share/tzomet-lite \
+    /etc/systemd/system/tzomet-api.service /etc/systemd/system/tzomet-worker.service; do
+    [[ ! -e "$legacy_path" && ! -L "$legacy_path" ]] \
+        || fail "legacy installation detected; complete the namespace migration before provisioning"
+done
+for legacy_user in tzomet tzomet-deploy; do
+    ! getent passwd "$legacy_user" >/dev/null \
+        || fail "legacy application account detected; complete the namespace migration before provisioning"
+done
+! getent group tzomet-openclaw >/dev/null \
+    || fail "legacy runtime group detected; complete the namespace migration before provisioning"
+for helper in tzomet-deploy tzomet-ai-deploy tzomet-release-deploy tzomet-github-ssh; do
+    [[ ! -e "/usr/local/sbin/$helper" ]] || fail "main deployment helper exists: $helper"
+done
+if [[ -e /etc/tz-lite-installation ]]; then
+    [[ "$(cat /etc/tz-lite-installation)" == tz.cyber-money.org ]] || fail "Lite installation domain mismatch"
+else
+    [[ ! -e /etc/tz/Config.toml && ! -e /srv/tz/current ]] || fail "existing application is not marked as Lite"
+fi
+deploy_key="${1:-}"
+if [[ -n "$deploy_key" ]]; then
+    [[ -f "$deploy_key" ]] || fail "deploy public key file is missing"
+    read -r key_type key_data _ < "$deploy_key"
+    [[ "$key_type" == ssh-ed25519 && "$key_data" =~ ^[A-Za-z0-9+/=]+$ ]] || fail "provide a dedicated Ed25519 public key without key options"
+    [[ "$(awk 'NF {n++} END {print n}' "$deploy_key")" == 1 ]] || fail "public key file must contain one key"
+    ssh-keygen -lf "$deploy_key" >/dev/null || fail "invalid public key"
+else
+    [[ -s /var/lib/tz-deploy/.ssh/authorized_keys ]] || fail "first install requires the dedicated deployment public key"
+fi
+
+export DEBIAN_FRONTEND=noninteractive
+apt-get update
+apt-get install --yes --no-install-recommends \
+    ca-certificates curl openssl jq python3 openssh-server sudo util-linux \
+    postgresql postgresql-client redis-server nginx certbot docker.io docker-compose-v2 \
+    clamav clamav-daemon clamav-freshclam clamdscan
+systemctl enable --now postgresql.service
+[[ "$(runuser -u postgres -- psql -XAtqc "SELECT count(*) FROM pg_roles WHERE rolname = 'tzomet'")" == 0 \
+    && "$(runuser -u postgres -- psql -XAtqc "SELECT count(*) FROM pg_database WHERE datname = 'tzomet'")" == 0 ]] \
+    || fail "legacy database detected; complete the namespace migration before provisioning"
+if ! id tz >/dev/null 2>&1; then
+    useradd --system --home-dir /var/lib/tz --shell /usr/sbin/nologin tz
+fi
+if ! id tz-deploy >/dev/null 2>&1; then
+    useradd --system --home-dir /var/lib/tz-deploy --shell /bin/bash tz-deploy
+fi
+if ! getent group tz-openclaw >/dev/null; then
+    groupadd --system tz-openclaw
+fi
+# The upload account must never gain Docker/root privileges or control its shell startup files.
+[[ "$(id -Gn tz-deploy)" == tz-deploy ]] || fail "deployment account has unexpected groups"
+install -d -o root -g root -m 0755 /var/lib/tz /srv/tz /srv/tz/releases
+install -d -o root -g root -m 0700 /var/backups/tz /var/lib/tz/deployment
+if [[ ! -L /srv/tz/current ]]; then
+    printf '%s\n' 'waiting-for-first-artifact-release' > /var/lib/tz/deployment/worker-blocked
+fi
+install -d -o tz -g tz -m 0700 /var/lib/tz/attachments
+install -d -o root -g tz -m 0750 /var/lib/tz/geoip /etc/tz
+install -d -o redis -g redis -m 0750 /var/lib/tz/redis
+install -d -o tz-deploy -g tz-deploy -m 0700 /var/lib/tz/incoming
+install -d -o root -g root -m 0755 /var/lib/tz-deploy
+install -d -o root -g root -m 0755 /var/lib/tz-deploy/.ssh
+install -d -o root -g root -m 0755 /usr/local/lib/tz /usr/local/share/tz-lite
+printf '%s\n' tz.cyber-money.org > /etc/tz-lite-installation
+chown root:root /etc/tz-lite-installation
+chmod 0644 /etc/tz-lite-installation
+install -d -o root -g root -m 0755 /srv/tz-ai /srv/tz-ai/releases
+install -d -o root -g tz-openclaw -m 0750 /var/lib/tz-ai /var/lib/tz-ai/openclaw /var/lib/tz-ai/openclaw/runtime
+install -d -o 1000 -g 1000 -m 0700 \
+    /var/lib/tz-ai/openclaw/runtime/state \
+    /var/lib/tz-ai/openclaw/runtime/state/workspace-support \
+    /var/lib/tz-ai/openclaw/runtime/workspace \
+    /var/lib/tz-ai/openclaw/runtime/auth
+install -d -o root -g root -m 0700 /var/lib/tz-ai/firecrawl /var/lib/tz-ai/firecrawl/runtime
+install -o root -g root -m 0644 "$shared_dir/tz-ai-runtime.conf" /etc/tmpfiles.d/tz-ai-runtime.conf
+systemd-tmpfiles --create /etc/tmpfiles.d/tz-ai-runtime.conf
+
+systemctl enable --now postgresql.service docker.service
+install -o root -g root -m 0644 "$source_dir/configure-docker.py" /usr/local/lib/tz/lite-configure-docker.py
+python3 /usr/local/lib/tz/lite-configure-docker.py
+if [[ ! -f /etc/tz/Config.toml ]]; then
+    [[ "$(runuser -u postgres -- psql -XAtqc "SELECT count(*) FROM pg_roles WHERE rolname = 'tz'")" == 0 ]] \
+        || fail "an existing database role needs review before first Lite installation"
+    [[ "$(runuser -u postgres -- psql -XAtqc "SELECT count(*) FROM pg_database WHERE datname = 'tz'")" == 0 ]] \
+        || fail "an existing database needs review before first Lite installation"
+fi
+python3 "$source_dir/render-config.py" --template "$source_dir/Config.lite.toml.template" \
+    --directory /etc/tz --openclaw-directory /var/lib/tz-ai/openclaw
+chown root:root /var/lib/tz-ai/openclaw/.env
+chmod 0600 /var/lib/tz-ai/openclaw/.env
+chown root:tz /etc/tz/Config.toml /etc/tz/database.password /etc/tz/redis.password /etc/tz/tz.env
+chmod 0640 /etc/tz/Config.toml /etc/tz/database.password /etc/tz/redis.password /etc/tz/tz.env
+if [[ "$(runuser -u postgres -- psql -XAtqc "SELECT count(*) FROM pg_roles WHERE rolname = 'tz'")" == 0 ]]; then
+    runuser -u postgres -- createuser --login --no-createdb --no-createrole --no-superuser tz
+fi
+[[ "$(runuser -u postgres -- psql -XAtqc "SELECT rolsuper OR rolcreatedb OR rolcreaterole OR rolreplication OR rolbypassrls FROM pg_roles WHERE rolname = 'tz'")" == f ]] \
+    || fail "application database role has unexpected privileges"
+database_password="$(tr -d '\n' < /etc/tz/database.password)"
+# Reapply the same persisted password; never generate a replacement on reruns.
+printf "ALTER ROLE tz PASSWORD '%s';\n" "$database_password" \
+    | runuser -u postgres -- psql -Xq --set ON_ERROR_STOP=1
+unset database_password
+if [[ "$(runuser -u postgres -- psql -XAtqc "SELECT count(*) FROM pg_database WHERE datname = 'tz'")" == 0 ]]; then
+    runuser -u postgres -- createdb --owner tz --encoding UTF8 tz
+fi
+[[ "$(runuser -u postgres -- psql -XAtqc "SELECT pg_get_userbyid(datdba) FROM pg_database WHERE datname = 'tz'")" == tz ]] \
+    || fail "application database has an unexpected owner"
+redis_password="$(tr -d '\n' < /etc/tz/redis.password)"
+printf '%s\n' 'user default off' \
+    "user tz on >${redis_password} resetkeys resetchannels &tz.events +@connection +@pubsub" \
+    > /etc/redis/tz-users.acl
+chown root:redis /etc/redis/tz-users.acl
+chmod 0640 /etc/redis/tz-users.acl
+install -o root -g redis -m 0640 "$shared_dir/tz-redis.conf" /etc/redis/tz.conf
+install -o root -g root -m 0644 "$shared_dir/tz-redis.service" /etc/systemd/system/tz-redis.service
+systemctl daemon-reload
+systemctl enable tz-redis.service
+systemctl restart tz-redis.service
+REDISCLI_AUTH="$redis_password" redis-cli --user tz -h 127.0.0.1 -p 16379 ping | grep -qx PONG \
+    || fail "dedicated Redis did not become ready"
+unset redis_password
+
+sed -i \
+    -e '/^[#[:space:]]*TCPSocket[[:space:]]/d' \
+    -e '/^[#[:space:]]*TCPAddr[[:space:]]/d' \
+    -e '/^[#[:space:]]*StreamMaxLength[[:space:]]/d' \
+    -e '/^[#[:space:]]*MaxFileSize[[:space:]]/d' \
+    -e '/^[#[:space:]]*MaxScanSize[[:space:]]/d' /etc/clamav/clamd.conf
+printf '%s\n' 'TCPSocket 3310' 'TCPAddr 127.0.0.1' 'StreamMaxLength 55M' 'MaxFileSize 55M' 'MaxScanSize 60M' >> /etc/clamav/clamd.conf
+install -d -o root -g root -m 0755 /etc/systemd/system/clamav-daemon.socket.d
+install -o root -g root -m 0644 "$shared_dir/clamav-daemon.socket.conf" /etc/systemd/system/clamav-daemon.socket.d/tz-tcp.conf
+if [[ ! -f /var/lib/clamav/main.cvd && ! -f /var/lib/clamav/main.cld ]]; then
+    systemctl stop clamav-freshclam.service
+    freshclam --quiet
+fi
+systemctl daemon-reload
+systemctl enable clamav-freshclam.service clamav-daemon.service
+systemctl restart clamav-freshclam.service
+systemctl stop clamav-daemon.service
+systemctl restart clamav-daemon.socket
+systemctl start clamav-daemon.service
+clamav_ready=0
+for ((attempt = 0; attempt < 120; attempt++)); do
+    if python3 -c 'import socket; s = socket.create_connection(("127.0.0.1", 3310), 2); s.sendall(b"zPING\0"); assert s.recv(16).rstrip(b"\0") == b"PONG"; s.close()' >/dev/null 2>&1; then
+        clamav_ready=1
+        break
+    fi
+    sleep 1
+done
+[[ "$clamav_ready" == 1 ]] || fail "ClamAV did not become ready"
+
+install -o root -g root -m 0644 "$source_dir/lite-release.py" /usr/local/lib/tz/lite-release.py
+install -o root -g root -m 0644 "$source_dir/lite-ai-release.py" /usr/local/lib/tz/lite-ai-release.py
+install -o root -g root -m 0755 "$source_dir/tz-lite-deploy" /usr/local/sbin/tz-lite-deploy
+install -o root -g root -m 0755 "$source_dir/tz-lite-ai-deploy" /usr/local/sbin/tz-lite-ai-deploy
+install -o root -g root -m 0755 "$source_dir/tz-lite-github-ssh" /usr/local/sbin/tz-lite-github-ssh
+install -o root -g root -m 0644 "$shared_dir/tz-api.service" /etc/systemd/system/tz-api.service
+install -o root -g root -m 0644 "$shared_dir/tz-worker.service" /etc/systemd/system/tz-worker.service
+printf '%s\n' 'tz-deploy ALL=(root) NOPASSWD: /usr/local/sbin/tz-lite-deploy' > /etc/sudoers.d/tz-lite-deploy
+chmod 0440 /etc/sudoers.d/tz-lite-deploy
+visudo -cf /etc/sudoers.d/tz-lite-deploy >/dev/null
+if [[ -n "$deploy_key" ]]; then
+    printf 'restrict %s %s\n' "$key_type" "$key_data" > /var/lib/tz-deploy/.ssh/authorized_keys
+    chown root:root /var/lib/tz-deploy/.ssh/authorized_keys
+    chmod 0644 /var/lib/tz-deploy/.ssh/authorized_keys
+fi
+install -d -o root -g root -m 0755 /etc/ssh/sshd_config.d
+install -o root -g root -m 0644 "$source_dir/sshd-deploy.conf" /etc/ssh/sshd_config.d/tz-lite-deploy.conf
+/usr/sbin/sshd -t
+systemctl reload ssh.service
+
+install -d -o root -g root -m 0755 /var/www/letsencrypt /etc/nginx/snippets /etc/letsencrypt/renewal-hooks/deploy
+install -o root -g root -m 0644 "$source_dir/nginx-global.conf" /etc/nginx/conf.d/tz-lite-global.conf
+install -o root -g root -m 0644 "$shared_dir/tz-proxy.conf" /etc/nginx/snippets/tz-lite-proxy.conf
+cloudflare_temp="$(mktemp -d)"
+trap 'rm -rf -- "$cloudflare_temp"' EXIT
+curl --proto '=https' --tlsv1.2 --fail --show-error --silent --max-time 30 --retry 3 --retry-all-errors --retry-delay 2 https://www.cloudflare.com/ips-v4 -o "$cloudflare_temp/v4"
+curl --proto '=https' --tlsv1.2 --fail --show-error --silent --max-time 30 --retry 3 --retry-all-errors --retry-delay 2 https://www.cloudflare.com/ips-v6 -o "$cloudflare_temp/v6"
+python3 - "$cloudflare_temp" <<'PY'
+import ipaddress, pathlib, sys
+root = pathlib.Path(sys.argv[1])
+networks = []
+for version, minimum in ((4, 10), (6, 3)):
+    ranges = [ipaddress.ip_network(line.strip()) for line in (root / f"v{version}").read_text().splitlines() if line.strip()]
+    if len(ranges) < minimum or any(item.version != version or item.prefixlen == 0 for item in ranges):
+        raise SystemExit("Cloudflare network list is invalid or incomplete")
+    networks.extend(ranges)
+(root / "snippet").write_text("".join(f"set_real_ip_from {item};\n" for item in networks)
+                              + "real_ip_header CF-Connecting-IP;\nreal_ip_recursive on;\n")
+PY
+install -o root -g root -m 0644 "$cloudflare_temp/snippet" /etc/nginx/snippets/tz-lite-cloudflare-real-ip.conf
+install -o root -g root -m 0644 "$source_dir/nginx-http.conf" /usr/local/share/tz-lite/nginx-http.conf
+install -o root -g root -m 0644 "$source_dir/nginx-https.conf" /usr/local/share/tz-lite/nginx-https.conf
+install -o root -g root -m 0755 "$source_dir/tz-lite-enable-https" /usr/local/sbin/tz-lite-enable-https
+install -o root -g root -m 0755 "$source_dir/tz-lite-certbot-deploy" /etc/letsencrypt/renewal-hooks/deploy/tz-lite-nginx
+site_template=nginx-http.conf
+if [[ -f /etc/letsencrypt/live/tz.cyber-money.org/fullchain.pem && -f /etc/letsencrypt/live/tz.cyber-money.org/privkey.pem ]]; then
+    site_template=nginx-https.conf
+fi
+install -o root -g root -m 0644 "$source_dir/$site_template" /etc/nginx/sites-available/tz-lite
+ln -sfn /etc/nginx/sites-available/tz-lite /etc/nginx/sites-enabled/tz-lite
+nginx -t
+systemctl enable --now nginx.service
+systemctl reload nginx.service
+systemctl daemon-reload
+# The artifact receiver starts these only after the compiled release is installed.
+systemctl enable tz-api.service tz-worker.service
+echo "TZ Lite provision: runtime ready; no application deployed and no certificate requested"

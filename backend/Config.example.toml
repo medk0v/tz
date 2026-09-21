@@ -1,0 +1,116 @@
+[product]
+# The UUID of the single internal project created during provisioning.
+project-id = "00000000-0000-0000-0000-000000000001"
+
+[server]
+host = "0.0.0.0"
+port = 8080
+allowed-origins = ["http://localhost:5173", "http://localhost:5174"]
+# Only list reverse proxies that overwrite X-Tz-Client-IP with one bare IP.
+# Leave empty when clients connect directly to the API.
+trusted-proxies = []
+
+[worker]
+host = "0.0.0.0"
+port = 8081
+# Independent task claim loops; all agent queues share ai-run-concurrency.
+ai-task-concurrency = 4
+# Total API, scheduled and conversation runs across workers (1..16).
+ai-run-concurrency = 2
+
+[pg]
+# Connection string for an existing PostgreSQL instance.
+url = "postgres://tzomet:tzomet@localhost:5432/tzomet"
+max-connections = 10
+migrate-on-start = true
+
+[redis]
+# Connection string for an existing Redis instance. Omit `url` to disable Redis.
+url = "redis://localhost:6379"
+required = false
+
+[geoip]
+# Relative paths are resolved from this configuration file's directory.
+city-database-path = "data/GeoLite2-City.mmdb"
+country-database-path = "data/GeoLite2-Country.mmdb"
+
+[outbox]
+poll-interval-ms = 500
+max-attempts = 10
+
+[widget]
+session-ttl-seconds = 86400
+visitor-data-retention-days = 30
+
+[realtime]
+ticket-ttl-seconds = 60
+
+[auth]
+# Local HTTP development uses non-Secure cookies. Set cookie-secure = true
+# behind HTTPS in every deployed environment.
+cookie-secure = false
+session-idle-ttl-seconds = 3600
+session-absolute-ttl-seconds = 43200
+# Opt-in remembered password sessions, used by the Android app.
+remember-session-idle-ttl-seconds = 2592000
+remember-session-absolute-ttl-seconds = 7776000
+login-window-seconds = 600
+login-max-attempts = 8
+login-lockout-seconds = 900
+
+[attachments]
+# Keep uploads disabled unless a private ClamAV daemon is reachable. A file is
+# never published when scanning is unavailable or returns an unsafe result.
+# Public scanner addresses are rejected; use loopback, RFC1918, or IPv6 ULA.
+# For isolated local development only, use scan-mode = "disabled" and omit
+# clamav-address.
+enabled = true
+storage-path = "data/attachments"
+scan-mode = "required"
+clamav-address = "127.0.0.1:3310"
+scan-timeout-seconds = 60
+max-concurrent-uploads = 4
+max-conversation-bytes = 268435456
+max-tenant-bytes = 5368709120
+retention-days = 30
+
+[secrets]
+# Base64-encoded 32-byte key used to encrypt provider API keys at rest.
+# Keep the value itself outside Config.toml and rotate it through a new key version.
+encryption-key-env = "TZOMET_SECRETS_KEY"
+key-version = "v1"
+
+[telegram]
+# Required before Telegram bots can be connected. Telegram posts updates to
+# {webhook-base-url}/telegram/v1/webhooks/{channel-public-id}.
+# The worker automatically falls back to getUpdates when Telegram reports a
+# sustained webhook delivery failure, then periodically restores the webhook.
+webhook-base-url = "https://tzomet.io"
+
+[telephony]
+# Phone channels (standard edition). Asterisk streams call audio to the worker
+# over AudioSocket on a loopback or private address and registers calls through
+# the API origin below. Omit audiosocket-address to disable phone calls.
+# audiosocket-address = "127.0.0.1:9092"
+# gateway-api-base-url = "http://127.0.0.1:18080"
+
+[mobile_push]
+# Enable only after configuring the Android app and the same Firebase project.
+enabled = false
+# Store this secret outside the checkout, readable only by API/worker users.
+# Relative paths are resolved from this config file's directory.
+# service-account-path = "/etc/tzomet/firebase-service-account.json"
+
+[openclaw]
+# Only profiles using this exact provider base URL receive short-lived runtime grants.
+base-url = "http://127.0.0.1:18789/v1"
+# Relative paths are resolved from this configuration file's directory.
+grant-directory = "../infra/openclaw/runtime/agent-secrets"
+# The agent can write only short-lived action requests here; keep it separate from grants.
+action-directory = "../infra/openclaw/runtime/agent-actions"
+# Must outlive the five-minute provider timeout plus cleanup margin.
+grant-ttl-seconds = 360
+
+[logging]
+filter = "tz_backend=debug,tower_http=info"
+format = "pretty"

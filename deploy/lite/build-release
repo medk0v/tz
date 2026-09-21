@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+fail() { echo "Lite build: $*" >&2; exit 1; }
+[[ "$#" -eq 2 && "$1" =~ ^[0-9a-f]{40}$ ]] \
+    || fail "usage: build-release <40-character SHA> <output directory>"
+[[ ! -e /etc/tz-lite-installation && ! -L /etc/tz-lite-installation \
+    && ! -e /etc/tzomet-lite-installation && ! -L /etc/tzomet-lite-installation 
+    ]] \
+    || fail "builds are forbidden on the Lite application server"
+release_sha="$1"
+root="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+[[ "$(git -C "$root" rev-parse HEAD)" == "$release_sha" ]] || fail "checkout does not match release SHA"
+[[ -z "$(git -C "$root" status --porcelain --untracked-files=normal)" ]] \
+    || fail "release builds require a clean checkout"
+mkdir -p "$2"
+output="$(cd "$2" && pwd)"
+staging="$(mktemp -d)"
+trap 'rm -rf -- "$staging"' EXIT
+mkdir "$staging/source"
+# Only committed sources enter the builder context. In particular, never send
+# local .env files, node_modules, or the backend target cache to Docker.
+git -C "$root" archive "$release_sha" backend frontend infra/openclaw/bin \
+    | tar -x -C "$staging/source"
+
+# Optional per-deployment obfuscation key. When set, each customer build gets a
+# distinct keystream for obf!-protected strings; when unset the build stays
+# byte-reproducible with a fixed keystream (still obfuscated).
+obf_build_args=()
+if [[ -n "${TZ_OBFUSCATION_KEY:-}" ]]; then
+    obf_build_args+=(--build-arg "TZ_OBFUSCATION_KEY=$TZ_OBFUSCATION_KEY")
+fi
+
+# Native ARM64 is preferred. A configured Buildx builder may use a remote ARM64
+# node or emulation; compilation still occurs entirely outside the target server.
+docker buildx build --platform linux/arm64 \
+    --file "$root/deploy/lite/Dockerfile.release" \
+    --build-arg "RELEASE_SHA=$release_sha" \
+    "${obf_build_args[@]}" \
+    --output "type=local,dest=$staging/artifacts" \
+    "$staging/source"
+bash "$root/deploy/lite/package-release" \
+    --release "$release_sha" --arch aarch64 \
+    --backend-dir "$staging/artifacts/bin" \
+    --geoip-dir "$staging/artifacts/geoip" \
+    --frontend-dir "$staging/artifacts/frontend" \
+    --output-dir "$output"

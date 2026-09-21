@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+# Run explicitly after approving certificate issuance and HTTPS activation.
+set -Eeuo pipefail
+umask 077
+fail() { echo "TZ Lite HTTPS: $*" >&2; exit 1; }
+[[ "$EUID" -eq 0 ]] || fail "must run as root"
+[[ "$#" -le 1 ]] || fail "usage: tz-lite-enable-https [certificate-contact-email]"
+contact_args=(--register-unsafely-without-email)
+if [[ "$#" -eq 1 ]]; then
+    [[ "$1" =~ ^[^[:space:]@]+@[^[:space:]@]+\.[^[:space:]@]+$ ]] || fail "invalid certificate contact email"
+    contact_args=(--email "$1")
+fi
+template=/usr/local/share/tz-lite/nginx-https.conf
+site=/etc/nginx/sites-available/tz-lite
+[[ -f "$template" && -f "$site" ]] || fail "run Lite provisioning first"
+certbot certonly --webroot --webroot-path /var/www/letsencrypt \
+    --cert-name tz.cyber-money.org --domain tz.cyber-money.org \
+    --non-interactive --agree-tos "${contact_args[@]}" --keep-until-expiring
+previous="$(mktemp)"
+trap 'rm -f -- "$previous"' EXIT
+cp "$site" "$previous"
+install -o root -g root -m 0644 "$template" "$site"
+if ! nginx -t || ! systemctl reload nginx.service; then
+    install -o root -g root -m 0644 "$previous" "$site"
+    nginx -t && systemctl reload nginx.service
+    fail "could not activate HTTPS; previous nginx site restored"
+fi
+systemctl enable --now certbot.timer
+echo "TZ Lite HTTPS: tz.cyber-money.org activated with automatic renewal"

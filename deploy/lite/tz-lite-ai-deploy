@@ -1,0 +1,97 @@
+#!/usr/bin/env bash
+# Called by the application receiver while API/worker are stopped and blocked.
+set -Eeuo pipefail
+umask 027
+fail() { echo "TZ Lite AI deploy: $*" >&2; exit 1; }
+[[ "$EUID" -eq 0 ]] || fail "must run as root"
+validate_only=0
+if [[ "${1:-}" == --validate ]]; then validate_only=1; shift; fi
+[[ "$#" -eq 1 && "$1" =~ ^[0-9a-f]{40}$ ]] || fail "usage: tz-lite-ai-deploy [--validate] <SHA>"
+sha="$1"
+archive="tz-lite-ai-${sha}.tar.gz"
+incoming=/var/lib/tz/incoming
+release="/srv/tz-ai/releases/$sha"
+validator=/usr/local/lib/tz/lite-ai-release.py
+installation=/etc/tz-lite-installation
+[[ "$(uname -m)" == aarch64 ]] || fail "ARM64 host required"
+[[ -f "$installation" && ! -L "$installation" \
+    && "$(stat -c '%U' "$installation")" == root \
+    && "$(cat "$installation")" == tz.cyber-money.org ]] || fail "this host is not the Lite installation"
+[[ -f "$validator" && ! -L "$validator" && "$(stat -c '%U' "$validator")" == root ]] || fail "unsafe validator"
+# Lite artifacts pin Docker config digests; containerd identifies images by manifest digest.
+docker_store="$(docker info --format '{{json .DriverStatus}}')"
+[[ "$docker_store" != *io.containerd.snapshotter.v1* ]] \
+    || fail "classic Docker image store required; run Lite provisioning before deployment"
+for file in "$incoming/$archive" "$incoming/$archive.sha256"; do
+    [[ -f "$file" && ! -L "$file" && "$(stat -c '%U' "$file")" == tz-deploy \
+        && "$(stat -c '%a' "$file")" =~ ^(600|640|644)$ ]] || fail "unsafe AI upload"
+done
+exec 8>/run/lock/tz-lite-ai-deploy.lock
+flock -n 8 || fail "another AI deployment is running"
+install -d -o root -g root -m 0755 /srv/tz-ai /srv/tz-ai/releases
+stage="$(mktemp -d "/srv/tz-ai/releases/.${sha}.XXXXXX")"
+trap 'rm -rf -- "$stage"' EXIT
+install -o root -g root -m 0600 "$incoming/$archive" "$stage/$archive"
+install -o root -g root -m 0600 "$incoming/$archive.sha256" "$stage/$archive.sha256"
+python3 "$validator" validate "$stage/$archive" --checksum-file "$stage/$archive.sha256" \
+    --release "$sha" --destination "$stage/runtime"
+if [[ "$validate_only" -eq 1 ]]; then
+    echo "Lite AI artifact is valid for ARM64: $sha"
+    exit 0
+fi
+[[ -f /var/lib/tz/deployment/worker-blocked ]] || fail "application worker safety block is absent"
+systemctl is-active --quiet tz-worker.service && fail "application worker must be stopped"
+systemctl is-active --quiet tz-api.service && fail "application API must be stopped"
+
+if [[ -e "$release" || -L "$release" ]]; then
+    [[ -d "$release" && ! -L "$release" && "$(stat -c '%U' "$release")" == root ]] || fail "unsafe existing AI release"
+    cmp -s "$release/release.json" "$stage/runtime/release.json" || fail "same-SHA AI artifact differs"
+else
+    chown -R root:root "$stage/runtime"
+    find "$stage/runtime" -type d -exec chmod 0755 {} +
+    mv "$stage/runtime" "$release"
+fi
+docker image load --input "$release/images.tar" >/dev/null
+# Verify Docker reports the exact image IDs and architecture from the manifest.
+python3 - "$release/release.json" <<'PY'
+import json, subprocess, sys
+metadata = json.load(open(sys.argv[1]))
+for image in {image for stack in metadata['images'].values() for image in stack.values()}:
+    result = json.loads(subprocess.check_output(['docker', 'image', 'inspect', image]))[0]
+    if result['Id'] != image or result['Architecture'] != 'arm64' or result['Os'] != 'linux':
+        raise SystemExit('loaded image identity/architecture mismatch')
+PY
+[[ -f /var/lib/tz-ai/openclaw/.env ]] || fail "provisioned OpenClaw token environment is missing"
+install -d -o root -g root -m 0700 /var/lib/tz-ai/firecrawl
+if [[ ! -f /var/lib/tz-ai/firecrawl/.env ]]; then
+    python3 - "$release/firecrawl/env.example" <<'PY'
+from pathlib import Path
+import secrets, sys
+content = Path(sys.argv[1]).read_text().replace('POSTGRES_PASSWORD=\n', 'POSTGRES_PASSWORD=' + secrets.token_hex(32) + '\n')
+path = Path('/var/lib/tz-ai/firecrawl/.env')
+with path.open('x') as stream:
+    stream.write(content)
+path.chmod(0o600)
+PY
+fi
+for stack in openclaw firecrawl; do
+    ln -sfn "/var/lib/tz-ai/$stack/.env" "$release/$stack/.env"
+done
+install -d -o 1000 -g 1000 -m 0700 /var/lib/tz-ai/openclaw/runtime \
+    /var/lib/tz-ai/openclaw/runtime/state /var/lib/tz-ai/openclaw/runtime/state/workspace-support \
+    /var/lib/tz-ai/openclaw/runtime/workspace /var/lib/tz-ai/openclaw/runtime/auth
+ln -sfn /var/lib/tz-ai/openclaw/runtime "$release/openclaw/runtime"
+export OPENCLAW_GRANT_GID="$(getent group tz-openclaw | cut -d: -f3)"
+export OPENCLAW_GRANT_HOST_DIR=/run/tz-ai/openclaw/agent-secrets
+export OPENCLAW_ACTION_HOST_DIR=/run/tz-ai/openclaw/agent-actions
+export OPENCLAW_SHELL_HOST_DIR=/run/tz-ai/openclaw/shell
+[[ "$OPENCLAW_GRANT_GID" =~ ^[0-9]+$ ]] || fail "OpenClaw group is missing"
+"$release/openclaw/manage.sh" start
+"$release/openclaw/manage.sh" doctor
+"$release/openclaw/manage.sh" smoke
+"$release/firecrawl/manage.sh" start
+"$release/firecrawl/manage.sh" smoke
+"$release/openclaw/manage.sh" connect-firecrawl
+ln -s "$release" "$stage/next-current"
+mv -Tf "$stage/next-current" /srv/tz-ai/current
+echo "Lite AI runtime is healthy: $sha"

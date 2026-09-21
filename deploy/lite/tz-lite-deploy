@@ -1,0 +1,154 @@
+#!/usr/bin/env bash
+# Installed root-owned. Receives compiled binaries and static files, never source.
+set -Eeuo pipefail
+umask 027
+
+fail() { echo "TZ Lite deploy: $*" >&2; exit 1; }
+[[ "$EUID" -eq 0 ]] || fail "must run as root"
+[[ "$#" -eq 1 && "$1" =~ ^[0-9a-f]{40}$ ]] || fail "usage: tz-lite-deploy <40-character SHA>"
+release_sha="$1"
+archive_name="tz-lite-${release_sha}.tar.gz"
+incoming_root=/var/lib/tz/incoming
+release_root=/srv/tz/releases
+release_dir="${release_root}/${release_sha}"
+worker_block=/var/lib/tz/deployment/worker-blocked
+validator=/usr/local/lib/tz/lite-release.py
+ai_deploy=/usr/local/sbin/tz-lite-ai-deploy
+installation=/etc/tz-lite-installation
+
+for command_name in python3 curl flock install runuser pg_dump systemctl sha256sum; do
+    command -v "$command_name" >/dev/null || fail "missing command: ${command_name}"
+done
+[[ -f "$validator" && ! -L "$validator" && "$(stat -c '%U' "$validator")" == root ]] \
+    || fail "release validator is missing or unsafe"
+[[ -x "$ai_deploy" && ! -L "$ai_deploy" && "$(stat -c '%U' "$ai_deploy")" == root ]] \
+    || fail "prebuilt AI receiver is missing or unsafe"
+[[ "$(uname -m)" == aarch64 ]] || fail "this receiver requires the configured ARM64 host"
+[[ -f "$installation" && ! -L "$installation" \
+    && "$(stat -c '%U' "$installation")" == root \
+    && "$(cat "$installation")" == tz.cyber-money.org ]] \
+    || fail "this host is not the configured Lite installation"
+[[ "$(systemctl cat tz-worker.service)" == *"ConditionPathExists=!${worker_block}"* ]] \
+    || fail "worker unit does not enforce the deployment block"
+for incoming in "$incoming_root/$archive_name" "$incoming_root/$archive_name.sha256"; do
+    [[ -f "$incoming" && ! -L "$incoming" ]] || fail "missing or unsafe incoming file"
+    [[ "$(stat -c '%U' "$incoming")" == tz-deploy ]] || fail "unexpected upload owner"
+    [[ "$(stat -c '%a' "$incoming")" =~ ^(600|640|644)$ ]] || fail "unsafe upload permissions"
+done
+exec 9>/run/lock/tz-lite-deploy.lock
+flock -n 9 || fail "another Lite deployment is running"
+if [[ -e "$release_dir" || -L "$release_dir" ]]; then
+    [[ -d "$release_dir" && ! -L "$release_dir" \
+        && "$(stat -c '%U' "$release_dir")" == root ]] || fail "existing release is unsafe"
+fi
+[[ ! -e /srv/tz/current || -L /srv/tz/current ]] || fail "current path is not a symlink"
+staging="$(mktemp -d "${release_root}/.${release_sha}.XXXXXX")"
+previous_release=""
+if [[ -L /srv/tz/current ]]; then
+    previous_release="$(readlink -f /srv/tz/current)"
+    [[ "$previous_release" =~ ^/srv/tz/releases/[0-9a-f]{40}$ \
+        && -d "$previous_release" && ! -L "$previous_release" ]] || fail "previous release is unsafe"
+fi
+activated=0
+worker_stopped=0
+complete=0
+backup_path=""
+
+cleanup() {
+    status="$?"
+    trap - EXIT
+    set +e
+    if [[ "$complete" -ne 1 && "$worker_stopped" -eq 1 ]]; then
+        install -d -o root -g root -m 0700 /var/lib/tz/deployment
+        printf '%s\n' "$release_sha" > "$worker_block"
+        chmod 0600 "$worker_block"
+        systemctl stop tz-worker.service
+        if [[ "$activated" -eq 1 ]]; then
+            systemctl stop tz-api.service
+            if [[ -n "$previous_release" ]]; then
+                ln -s "$previous_release" "$staging/rollback-current"
+                mv -Tf "$staging/rollback-current" /srv/tz/current
+                # The previous binary may be incompatible with migrations already applied.
+                # Keep it stopped until an operator reviews the schema/backup.
+                echo "Previous release pointer restored; API and worker remain stopped." >&2
+            else
+                rm -f -- /srv/tz/current
+            fi
+        fi
+        echo "Deployment failed. No database rollback was performed. Backup: ${backup_path:-not created}" >&2
+    fi
+    rm -rf -- "$staging"
+    exit "$status"
+}
+trap cleanup EXIT
+
+# Freeze uploads before validating; the upload account cannot change this copy.
+install -o root -g root -m 0600 "$incoming_root/$archive_name" "$staging/$archive_name"
+install -o root -g root -m 0600 "$incoming_root/$archive_name.sha256" "$staging/$archive_name.sha256"
+python3 "$validator" validate "$staging/$archive_name" \
+    --checksum-file "$staging/$archive_name.sha256" \
+    --release "$release_sha" --arch aarch64 --destination "$staging/release"
+chown -R root:root "$staging/release"
+find "$staging/release" -type d -exec chmod 0755 {} +
+chown root:tz "$staging/release/bin/api" "$staging/release/bin/worker" "$staging/release/bin/bootstrap-admin"
+chmod 0444 "$staging/release/RELEASE_SHA" "$staging/release/release.json"
+reuse_release=0
+if [[ -d "$release_dir" ]]; then
+    cmp -s "$release_dir/release.json" "$staging/release/release.json" \
+        || fail "this SHA already has different artifacts; build a new commit"
+    reuse_release=1
+fi
+
+wait_ready() {
+    local port="$1" attempts="$2" attempt
+    for ((attempt = 0; attempt < attempts; attempt++)); do
+        if curl --connect-timeout 2 --max-time 5 -fsS "http://127.0.0.1:${port}/health/ready" >/dev/null; then
+            return 0
+        fi
+        sleep 1
+    done
+    return 1
+}
+
+# Validate both deliveries before stopping the current application.
+"$ai_deploy" --validate "$release_sha"
+
+install -d -o root -g root -m 0700 /var/lib/tz/deployment
+printf '%s\n' "$release_sha" > "$worker_block"
+chmod 0600 "$worker_block"
+worker_stopped=1
+systemctl stop tz-worker.service
+systemctl is-active --quiet tz-worker.service && fail "worker did not stop"
+
+# API applies embedded SQL migrations at startup, so stop writers and back up first.
+systemctl stop tz-api.service
+backup_path="/var/backups/tz/$(date -u +%Y%m%dT%H%M%SZ)-${release_sha}.dump"
+install -o root -g root -m 0600 /dev/null "$backup_path"
+runuser -u postgres -- pg_dump --format=custom tz > "$backup_path"
+[[ -s "$backup_path" ]] || fail "database backup is empty"
+
+"$ai_deploy" "$release_sha"
+[[ "$(readlink -f /srv/tz-ai/current)" == "/srv/tz-ai/releases/${release_sha}" ]] \
+    || fail "the matching AI release did not become active"
+
+if [[ "$reuse_release" -eq 0 ]]; then
+    mv "$staging/release" "$release_dir"
+fi
+ln -s "$release_dir" "$staging/next-current"
+mv -Tf "$staging/next-current" /srv/tz/current
+activated=1
+# Install the validated databases at the paths used by Config.lite.toml.
+# Both services are stopped; restarting also clears cached missing GeoIP readers.
+install -d -o root -g tz -m 0750 /var/lib/tz/geoip
+for database in GeoLite2-City.mmdb GeoLite2-Country.mmdb; do
+    install -o root -g tz -m 0640 "$release_dir/geoip/$database" "/var/lib/tz/geoip/$database"
+done
+systemctl restart tz-api.service
+wait_ready 18080 90 || fail "API did not become ready"
+
+rm -f -- "$worker_block"
+systemctl reset-failed tz-worker.service || true
+systemctl start tz-worker.service
+wait_ready 18081 60 || fail "worker did not become ready"
+complete=1
+echo "TZ Lite deploy: ${release_sha} is healthy; database backup: ${backup_path}"

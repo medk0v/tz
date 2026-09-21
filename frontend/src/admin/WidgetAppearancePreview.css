@@ -1,0 +1,10 @@
+.widget-appearance-preview {
+  display: block;
+  align-self: start;
+  width: 100%;
+  max-width: 400px;
+  height: 580px;
+  min-height: 580px;
+  border: 0;
+  background: transparent;
+}

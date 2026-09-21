@@ -1,0 +1,139 @@
+#!/usr/bin/env python3
+"""Build on an ARM64-capable builder; emit only saved images and runtime files."""
+import argparse
+import importlib.util
+import json
+import os
+from pathlib import Path
+import shutil
+import subprocess
+import tempfile
+
+ROOT = Path(__file__).resolve().parents[2]
+LITE = ROOT / "deploy/lite"
+FIRECRAWL_COMMIT = "7666c1f9ae8720a6bba271e0f60b6a217f8a5210"
+OPENCLAW_BASE = "ghcr.io/openclaw/openclaw@sha256:5dce2450d17a2b0ec3ee33faf2e56d4e330c7f7e50d9557354cbc60c34b94ed6"
+
+
+def run(*args, capture=False, **kwargs):
+    return subprocess.run([str(arg) for arg in args], check=True, text=True,
+                          stdout=subprocess.PIPE if capture else None, **kwargs).stdout
+
+
+def image_id(tag):
+    details = json.loads(run("docker", "image", "inspect", tag, capture=True))[0]
+    if details["Architecture"] != "arm64" or details["Os"] != "linux":
+        raise ValueError(f"image {tag} is not linux/arm64")
+    return details["Id"]
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--release", required=True)
+    parser.add_argument("--output-dir", type=Path, required=True)
+    parser.add_argument("--firecrawl-source", type=Path, help="optional existing pinned builder checkout")
+    parser.add_argument("--prune-builder", help="prune only the dedicated CI Buildx builder before packing")
+    args = parser.parse_args()
+    spec = importlib.util.spec_from_file_location("ai_release", LITE / "lite-ai-release.py")
+    artifact = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(artifact)
+    runtime_spec = importlib.util.spec_from_file_location("openclaw_runtime", LITE / "render-openclaw-runtime.py")
+    runtime = importlib.util.module_from_spec(runtime_spec)
+    runtime_spec.loader.exec_module(runtime)
+    artifact.require(artifact.re.fullmatch(r"[0-9a-f]{40}", args.release), "invalid release SHA")
+    artifact.require(not any(path.exists() or path.is_symlink() for path in (
+        Path('/etc/tz-lite-installation'), Path('/etc/tzomet-lite-installation'))),
+                     "builds are forbidden on the Lite application server")
+    artifact.require(run("git", "-C", ROOT, "rev-parse", "HEAD", capture=True).strip() == args.release,
+                     "checkout does not match release SHA")
+    artifact.require(not run("git", "-C", ROOT, "status", "--porcelain", "--untracked-files=normal", capture=True).strip(),
+                     "release builds require a clean checkout")
+    if args.prune_builder:
+        artifact.require(artifact.re.fullmatch(r"builder-[A-Za-z0-9-]+", args.prune_builder),
+                         "cache cleanup requires a dedicated CI builder name")
+        builder = run("docker", "buildx", "inspect", args.prune_builder, capture=True)
+        artifact.require(artifact.re.search(r"(?m)^Driver:\s+docker-container\s*$", builder),
+                         "cache cleanup requires an isolated docker-container builder")
+        os.environ['BUILDX_BUILDER'] = args.prune_builder
+    os.environ.setdefault('COMPOSE_PARALLEL_LIMIT', '1')
+    # Keep transient sources and rendered models on this builder only.
+    with tempfile.TemporaryDirectory(prefix="tz-lite-ai-build-") as temporary:
+        temporary = Path(temporary)
+        inputs = temporary / 'inputs'
+        inputs.mkdir()
+        source_archive = temporary / 'openclaw-source.tar'
+        run('git', '-C', ROOT, 'archive', '--output', source_archive, args.release, 'infra/openclaw')
+        run('tar', '-xf', source_archive, '-C', inputs)
+        openclaw_source = temporary / 'openclaw-build'
+        runtime.render_build_context(inputs / 'infra/openclaw', openclaw_source)
+        source = args.firecrawl_source.resolve() if args.firecrawl_source else temporary / "firecrawl-source"
+        if not args.firecrawl_source:
+            run("git", "clone", "--depth", "1", "--branch", "v2.11.162", "--single-branch",
+                "https://github.com/firecrawl/firecrawl.git", source)
+        artifact.require(run("git", "-C", source, "rev-parse", "HEAD", capture=True).strip() == FIRECRAWL_COMMIT,
+                         "unexpected Firecrawl source revision")
+        artifact.require(not run("git", "-C", source, "status", "--porcelain", "--untracked-files=normal", capture=True).strip(),
+                         "Firecrawl source checkout must be clean")
+        bundle = temporary / "runtime"
+        (bundle / "firecrawl").mkdir(parents=True)
+        gateway = f"tz-lite-openclaw:{args.release}"
+        browser = f"tz-lite-openclaw-browser:{args.release}"
+        # A single BuildKit graph also works with docker-container builders, which
+        # cannot resolve an earlier --load image from the host's image store.
+        wrapper_source = (openclaw_source / "Dockerfile").read_text()
+        plugin_source = (LITE / "Dockerfile.openclaw").read_text()
+        wrapper_from = "FROM ${OPENCLAW_BASE_IMAGE}"
+        plugin_from = "ARG OPENCLAW_WRAPPER_IMAGE\nFROM ${OPENCLAW_WRAPPER_IMAGE}"
+        artifact.require(wrapper_source.count(wrapper_from) == 1 and plugin_source.count(plugin_from) == 1,
+                         "OpenClaw Dockerfile boundaries changed; review image build")
+        combined = temporary / "Dockerfile.openclaw"
+        combined.write_text(wrapper_source.replace(wrapper_from, wrapper_from + " AS tz-wrappers")
+                            + "\n" + plugin_source.replace(plugin_from, "FROM tz-wrappers"))
+        shutil.copyfile(LITE / "bake-firecrawl-plugin.mjs", openclaw_source / "bake-firecrawl-plugin.mjs")
+        shutil.copyfile(LITE / "install-neutral-commands.mjs", openclaw_source / "install-neutral-commands.mjs")
+        for dockerfile, tag, build_args in (
+            (combined, gateway, ["--build-arg", f"OPENCLAW_BASE_IMAGE={OPENCLAW_BASE}"]),
+            (openclaw_source / "Dockerfile.browser", browser, []),
+        ):
+            run("docker", "buildx", "build", "--platform", "linux/arm64", "--load", "--file", dockerfile,
+                "--tag", tag, *build_args, openclaw_source)
+        gateway_id, browser_id = image_id(gateway), image_id(browser)
+        images = {"openclaw": {"openclaw-gateway": gateway_id, "shell-runner": gateway_id,
+                               "browser-runner": browser_id}}
+        run("python3", LITE / "render-openclaw-runtime.py", "--output", bundle / "openclaw",
+            "--gateway-image", gateway_id, "--browser-image", browser_id)
+
+        tags = {name: f"tz-lite-firecrawl-{name}:{args.release}"
+                for name in ("api", "playwright-service", "nuq-postgres")}
+        override = temporary / "build-images.json"
+        override.write_text(json.dumps({"services": {
+            name: {"platform": "linux/arm64", **({"image": tags[name]} if name in tags else {})}
+            for name in artifact.SERVICES["firecrawl"]}}))
+        compose = ["docker", "compose", "--project-name", "tz-lite-build", "--project-directory", source,
+                   "--env-file", ROOT / "infra/firecrawl/.env.example", "-f", source / "docker-compose.yaml",
+                   "-f", ROOT / "infra/firecrawl/compose.override.yaml", "-f", override]
+        builder_args = ['--builder', args.prune_builder] if args.prune_builder else []
+        run(*compose, "build", *builder_args, "--pull", "api", "playwright-service", "nuq-postgres")
+        run(*compose, "pull", "redis", "rabbitmq")
+        model = json.loads(run(*compose, "config", "--no-interpolate", "--no-env-resolution",
+                               "--no-path-resolution", "--format", "json", capture=True))
+        images["firecrawl"] = {name: image_id(model["services"][name]["image"])
+                               for name in artifact.SERVICES["firecrawl"]}
+        model = artifact.render_firecrawl(model, images["firecrawl"])
+        (bundle / "firecrawl/compose.yaml").write_text(json.dumps(model, indent=2) + "\n")
+        shutil.copyfile(LITE / "firecrawl-runtime", bundle / "firecrawl/manage.sh")
+        shutil.copyfile(ROOT / "infra/firecrawl/.env.example", bundle / "firecrawl/env.example")
+        all_images = sorted({value for stack in images.values() for value in stack.values()})
+        if args.prune_builder:
+            # Images were loaded into the daemon and remain available. Only this
+            # job's private BuildKit cache is discarded; never prune daemon images.
+            run('docker', 'buildx', 'prune', '--builder', args.prune_builder, '--all', '--force')
+        run("docker", "image", "save", "--output", bundle / "images.tar", *all_images)
+        artifact.package(bundle, images, args.release, args.output_dir.resolve())
+
+
+if __name__ == "__main__":
+    try:
+        main()
+    except (ValueError, OSError, subprocess.CalledProcessError) as error:
+        raise SystemExit(f"Lite AI build: {error}")

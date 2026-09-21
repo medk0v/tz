@@ -1,0 +1,271 @@
+/*
+ * Graphite palette: graphite surfaces with a lemon highlight.
+ * Lite always renders it in light mode; the standard edition offers it as a
+ * selectable theme with light and dark variants.
+ */
+:root[data-palette="graphite"] {
+  color: #3b3b3b;
+  background: #f5f5f3;
+  --graphite-highlight: #f6f881;
+  --graphite-highlight-hover: #ecee70;
+  --graphite-highlight-border: #d5d768;
+  --graphite-highlight-border-hover: #bfc156;
+  --graphite-on-highlight: #3b3b3b;
+  --graphite-highlight-tint: 30%;
+  --graphite-sidebar-text: #ffffff;
+  --graphite-sidebar-text-secondary: #e0e0da;
+  --graphite-sidebar-text-muted: #bcbcb4;
+  --graphite-sidebar-border: #55554f;
+  --graphite-sidebar-border-strong: #696961;
+  --graphite-sidebar-panel: #424241;
+  --graphite-sidebar-raised: #474747;
+  --graphite-sidebar-raised-strong: #53534f;
+  /* Shared palette hooks (used by admin/palette-routing-theme.css). */
+  --pal-primary: var(--graphite-highlight);
+  --pal-primary-hover: var(--graphite-highlight-hover);
+  --pal-primary-border: var(--graphite-highlight-border);
+  --pal-primary-border-hover: var(--graphite-highlight-border-hover);
+  --pal-on-primary: var(--graphite-on-highlight);
+  --pal-tint-color: var(--graphite-highlight);
+  --pal-tint: var(--graphite-highlight-tint);
+  --bg: #f5f5f3;
+  --sidebar: #3b3b3b;
+  --surface: #ffffff;
+  --surface-subtle: #f7f7f5;
+  --surface-strong: #ececea;
+  --text: #3b3b3b;
+  --text-secondary: #474747;
+  --text-muted: #70706b;
+  --border: #deded8;
+  --border-strong: #c9c9c1;
+  --accent: #474747;
+  --on-accent: #ffffff;
+  --focus: #474747;
+  --focus-ring: rgba(71, 71, 71, .16);
+  --shadow: rgba(59, 59, 59, .1);
+}
+
+:root[data-palette="graphite"][data-theme="dark"] {
+  color: #ededea;
+  background: #1a1a19;
+  color-scheme: dark;
+  --graphite-highlight: #e9eb78;
+  --graphite-highlight-hover: #f3f586;
+  --graphite-highlight-border: #e9eb78;
+  --graphite-highlight-border-hover: #f3f586;
+  --graphite-on-highlight: #232321;
+  --graphite-highlight-tint: 16%;
+  --graphite-sidebar-text: #f3f3ef;
+  --graphite-sidebar-text-secondary: #d2d2cb;
+  --graphite-sidebar-text-muted: #9c9c94;
+  --graphite-sidebar-border: #2f2f2c;
+  --graphite-sidebar-border-strong: #454541;
+  --graphite-sidebar-panel: #1f1f1e;
+  --graphite-sidebar-raised: #292927;
+  --graphite-sidebar-raised-strong: #34342f;
+  --bg: #1a1a19;
+  --sidebar: #141413;
+  --surface: #232321;
+  --surface-subtle: #292927;
+  --surface-strong: #32322f;
+  --text: #ededea;
+  --text-secondary: #c8c8c1;
+  --text-muted: #9a9a92;
+  --border: #363633;
+  --border-strong: #4a4a45;
+  --accent: #e9eb78;
+  --on-accent: #232321;
+  --focus: #e9eb78;
+  --focus-ring: rgba(233, 235, 120, .2);
+  --shadow: rgba(0, 0, 0, .34);
+}
+
+:root[data-palette="graphite"] .shell .sidebar {
+  --text: var(--graphite-sidebar-text);
+  --text-secondary: var(--graphite-sidebar-text-secondary);
+  --text-muted: var(--graphite-sidebar-text-muted);
+  --border: var(--graphite-sidebar-border);
+  --border-strong: var(--graphite-sidebar-border-strong);
+  --surface: var(--graphite-sidebar-raised);
+  --surface-subtle: var(--graphite-sidebar-raised);
+  --surface-strong: var(--graphite-sidebar-raised);
+  --accent: var(--graphite-highlight);
+  --on-accent: var(--graphite-on-highlight);
+  --focus: var(--graphite-highlight);
+  background: var(--sidebar);
+}
+
+:root[data-palette="graphite"] .shell :is(.sidebar-brand, .workspace-context, .sidebar-footer) {
+  border-color: var(--border);
+  background: var(--sidebar);
+}
+
+:root[data-palette="graphite"] :is(.shell .sidebar, .mobile-topbar) .brand-logo {
+  color: var(--graphite-sidebar-text);
+  --tz-logo-navy-start: #f3f3ef;
+  --tz-logo-navy-end: #c9c9c1;
+  --tz-logo-blue-start: var(--graphite-highlight);
+  --tz-logo-blue-end: var(--graphite-highlight-border);
+}
+
+:root[data-palette="graphite"] .brandless-workspace-mark {
+  border-color: var(--graphite-sidebar-border-strong);
+  background: var(--graphite-sidebar-raised);
+  color: var(--graphite-highlight);
+}
+
+:root[data-palette="graphite"] .shell :is(.sidebar-collapse-toggle, .sidebar-footer-button, .nav-link) {
+  color: var(--text-secondary);
+}
+
+:root[data-palette="graphite"] .shell :is(.sidebar-collapse-toggle:hover, .sidebar-footer-button:hover, .sidebar-footer-button[aria-expanded="true"], .workspace-context--editable:hover, .nav-link:hover) {
+  border-color: var(--border);
+  background: var(--graphite-sidebar-raised);
+  color: var(--graphite-sidebar-text);
+}
+
+:root[data-palette="graphite"] .shell .sidebar-footer-button--logout:hover {
+  border-color: #704238;
+  background: #3d251f;
+  color: #ff947c;
+}
+
+:root[data-palette="graphite"] .shell .workspace-context strong {
+  color: var(--text);
+}
+
+:root[data-palette="graphite"] .shell .workspace-context > svg,
+:root[data-palette="graphite"] .shell .nav-link:hover svg {
+  color: var(--graphite-highlight);
+  scale: 1;
+}
+
+:root[data-palette="graphite"] .shell .sidebar:not(.sidebar--collapsed) .nav-group-title {
+  color: var(--text-muted);
+}
+
+:root[data-palette="graphite"] .shell .nav-active-indicator {
+  background: var(--graphite-highlight);
+  box-shadow: none;
+}
+
+:root[data-palette="graphite"] .shell .nav-active-indicator::before,
+:root[data-palette="graphite"] .shell .nav-active-indicator::after {
+  content: none;
+}
+
+:root[data-palette="graphite"] .shell :is(.nav-link--active, .nav-link--active:hover) {
+  background: transparent;
+  color: var(--graphite-on-highlight);
+}
+
+:root[data-palette="graphite"] .shell :is(.nav-link--active, .nav-link--active:hover) svg {
+  color: inherit;
+}
+
+/* Preferences popover (standard edition only). */
+:root[data-palette="graphite"] .shell .sidebar-settings-panel {
+  border-color: var(--graphite-sidebar-border-strong);
+  background: var(--graphite-sidebar-panel);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, .28);
+}
+
+:root[data-palette="graphite"] .shell .sidebar-settings-header button:hover {
+  background: var(--graphite-sidebar-raised-strong);
+}
+
+:root[data-palette="graphite"] .shell :is(.language-select, .theme-switcher) {
+  border-color: var(--graphite-sidebar-border);
+  background: var(--sidebar);
+}
+
+:root[data-palette="graphite"] .shell .language-select {
+  color: var(--text-secondary);
+}
+
+:root[data-palette="graphite"] .shell .theme-option {
+  color: var(--text-muted);
+}
+
+:root[data-palette="graphite"] .shell .theme-option:hover:not(.theme-option--active) {
+  color: var(--graphite-sidebar-text);
+}
+
+:root[data-palette="graphite"] .shell .theme-option--active {
+  background: var(--graphite-highlight);
+  color: var(--graphite-on-highlight);
+  box-shadow: none;
+}
+
+:root[data-palette="graphite"] .shell .sidebar-sound-toggle {
+  border-color: var(--graphite-sidebar-border);
+  background: var(--sidebar);
+  color: var(--text-secondary);
+}
+
+:root[data-palette="graphite"] .shell .sidebar-sound-toggle[aria-pressed="true"] {
+  border-color: var(--graphite-highlight-border);
+  color: var(--graphite-highlight);
+}
+
+:root[data-palette="graphite"] .shell .sidebar-sound-picker select {
+  border-color: var(--graphite-sidebar-border);
+  background: var(--sidebar);
+  color: var(--text-secondary);
+}
+
+:root[data-palette="graphite"] .content {
+  background: var(--bg);
+}
+
+:root[data-palette="graphite"] :is(.connection-page--login, .connection-page--neutral:not(.connection-page--login)) {
+  background: var(--bg);
+}
+
+:root[data-palette="graphite"] .mobile-topbar {
+  border-bottom-color: var(--graphite-sidebar-border);
+  background: var(--sidebar);
+}
+
+:root[data-palette="graphite"] .mobile-topbar .menu-button {
+  color: var(--graphite-sidebar-text);
+}
+
+:root[data-palette="graphite"] :is(.page-toolbar, .conversation-toolbar)::after {
+  content: none;
+}
+
+:root[data-palette="graphite"] :is(.primary-button, .operator-notification-action, .message-send-button--ready) {
+  --on-accent: var(--graphite-on-highlight);
+  border-color: var(--graphite-highlight-border);
+  background: var(--graphite-highlight);
+  color: var(--on-accent);
+}
+
+:root[data-palette="graphite"] :is(.primary-button, .operator-notification-action, .message-send-button--ready):hover:not(:disabled) {
+  border-color: var(--graphite-highlight-border-hover);
+  background: var(--graphite-highlight-hover);
+  color: var(--graphite-on-highlight);
+}
+
+:root[data-palette="graphite"] :is(.conversation-row--active, .conversation-row--active:hover, .settings-row--active, .project-list-row--active, .project-list-row--active:hover, .knowledge-article-row--active, .task-list-row--selected) {
+  background: color-mix(in srgb, var(--graphite-highlight) var(--graphite-highlight-tint), var(--surface));
+  box-shadow: inset 3px 0 var(--graphite-highlight);
+}
+
+:root[data-palette="graphite"] :is(.section-tabs .section-tab--active, .conversation-queue-tabs button[aria-pressed="true"], .task-result-tab--active, .process-version-controls nav button.is-active) {
+  border-bottom-color: var(--accent);
+  background: color-mix(in srgb, var(--graphite-highlight) var(--graphite-highlight-tint), var(--surface));
+  color: var(--text);
+}
+
+:root[data-palette="graphite"] .conversation-details {
+  background: var(--surface-subtle);
+}
+
+:root[data-palette="graphite"] .message--outbound {
+  --on-accent: var(--graphite-on-highlight);
+  border-color: var(--graphite-highlight-border);
+  background: var(--graphite-highlight);
+  color: var(--on-accent);
+}

@@ -1,0 +1,78 @@
+[server]
+host = "127.0.0.1"
+port = 18080
+allowed-origins = ["https://tz.cyber-money.org"]
+trusted-proxies = ["127.0.0.1/32", "::1/128"]
+
+[product]
+project-id = "__PROJECT_ID__"
+
+[worker]
+host = "127.0.0.1"
+port = 18081
+
+# Total agent runs across workers (1..16).
+ai-run-concurrency = 2
+
+[pg]
+url = "postgres://tz:__DATABASE_PASSWORD__@127.0.0.1:5432/tz"
+max-connections = 20
+migrate-on-start = true
+
+[redis]
+url = "redis://tz:__REDIS_PASSWORD__@127.0.0.1:16379"
+required = true
+
+[geoip]
+city-database-path = "/var/lib/tz/geoip/GeoLite2-City.mmdb"
+country-database-path = "/var/lib/tz/geoip/GeoLite2-Country.mmdb"
+
+[outbox]
+poll-interval-ms = 500
+max-attempts = 10
+
+[widget]
+session-ttl-seconds = 86400
+visitor-data-retention-days = 30
+
+[realtime]
+ticket-ttl-seconds = 60
+
+[auth]
+cookie-secure = true
+session-idle-ttl-seconds = 3600
+session-absolute-ttl-seconds = 43200
+# Opt-in remembered password sessions, used by the Android app.
+remember-session-idle-ttl-seconds = 2592000
+remember-session-absolute-ttl-seconds = 7776000
+login-window-seconds = 600
+login-max-attempts = 8
+login-lockout-seconds = 900
+
+[attachments]
+enabled = true
+storage-path = "/var/lib/tz/attachments"
+scan-mode = "required"
+clamav-address = "127.0.0.1:3310"
+scan-timeout-seconds = 60
+max-concurrent-uploads = 4
+max-conversation-bytes = 268435456
+max-tenant-bytes = 5368709120
+retention-days = 30
+
+[secrets]
+encryption-key-env = "TZ_SECRETS_KEY"
+key-version = "v1"
+
+[telegram]
+webhook-base-url = "https://tz.cyber-money.org"
+
+[openclaw]
+base-url = "http://127.0.0.1:18789/v1"
+grant-directory = "/run/tz-ai/openclaw/agent-secrets"
+action-directory = "/run/tz-ai/openclaw/agent-actions"
+grant-ttl-seconds = 360
+
+[logging]
+filter = "info,tower_http=info"
+format = "json"

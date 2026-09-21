@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+# Run on the build host, after all frontend bundles and three binaries exist.
+set -euo pipefail
+exec python3 "$(dirname -- "$0")/lite-release.py" package "$@"

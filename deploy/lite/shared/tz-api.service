@@ -1,0 +1,43 @@
+[Unit]
+Description=TZ API
+After=network-online.target postgresql.service tz-redis.service clamav-daemon.service
+Wants=network-online.target tz-redis.service clamav-daemon.service
+Requires=postgresql.service
+
+[Service]
+Type=simple
+User=tz
+Group=tz
+SupplementaryGroups=tz-openclaw
+WorkingDirectory=/srv/tz/current
+EnvironmentFile=/etc/tz/tz.env
+ExecStartPre=/usr/bin/test -x /srv/tz/current/bin/api
+ExecStart=/srv/tz/current/bin/api --config /etc/tz/Config.toml
+Restart=on-failure
+RestartSec=3s
+TimeoutStartSec=120s
+TimeoutStopSec=30s
+UMask=0027
+LimitNOFILE=65536
+NoNewPrivileges=true
+PrivateDevices=true
+PrivateTmp=true
+ProtectClock=true
+ProtectControlGroups=true
+ProtectHome=true
+ProtectHostname=true
+ProtectKernelLogs=true
+ProtectKernelModules=true
+ProtectKernelTunables=true
+ProtectSystem=strict
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+RestrictNamespaces=true
+LockPersonality=true
+MemoryDenyWriteExecute=true
+CapabilityBoundingSet=
+AmbientCapabilities=
+ReadWritePaths=/var/lib/tz/attachments /run/tz-ai/openclaw/agent-secrets /run/tz-ai/openclaw/agent-actions
+ReadOnlyPaths=/etc/tz /var/lib/tz/geoip
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,285 @@
+.content[data-page-width="full"]:has(> .reply-templates-page),
+.content[data-page-width="full"]:has(> .ai-settings-page),
+.content[data-page-width="full"]:has(> .integrations-page),
+.content[data-page-width="full"]:has(> .projects-page),
+.content[data-page-width="full"]:has(> .access-tokens-page) {
+  padding: 0;
+  overflow: auto;
+  background: var(--surface);
+}
+
+.content[data-page-width="full"] > .reply-templates-page,
+.content[data-page-width="full"] > .ai-settings-page,
+.content[data-page-width="full"] > .integrations-page,
+.content[data-page-width="full"] > .projects-page,
+.content[data-page-width="full"] > .access-tokens-page {
+  min-height: 100%;
+  max-width: none;
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+}
+
+.content[data-page-width="full"] :is(
+  .reply-templates-page,
+  .ai-settings-page,
+  .integrations-page,
+  .projects-page,
+  .roles-page,
+  .access-tokens-page
+) > .page-toolbar {
+  min-height: 72px;
+  flex: 0 0 auto;
+  align-items: center;
+  margin: 0;
+  padding: 14px 24px;
+  background: var(--surface);
+}
+
+.content[data-page-width="full"] :is(
+  .reply-templates-page,
+  .ai-settings-page,
+  .integrations-page,
+  .projects-page,
+  .access-tokens-page
+) > .admin-notice {
+  flex: 0 0 auto;
+  margin: 8px 16px;
+}
+
+.content[data-page-width="full"] .reply-templates-readonly {
+  flex: 0 0 auto;
+  margin: 10px 16px;
+}
+
+.content[data-page-width="full"] .reply-templates-layout {
+  min-height: 0;
+  flex: 1 1 auto;
+  align-items: stretch;
+  border: 0;
+  border-radius: 0;
+}
+
+.content[data-page-width="full"] .reply-templates-list {
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.content[data-page-width="full"] .reply-templates-list ul {
+  min-height: 0;
+  flex: 1 1 auto;
+  max-height: none;
+}
+
+.content[data-page-width="full"] .reply-templates-main {
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.content[data-page-width="full"] .reply-templates-page > .empty-state {
+  min-height: 0;
+  flex: 1 1 auto;
+}
+
+.content[data-page-width="full"] .ai-settings-page > .section-tabs {
+  min-height: 44px;
+  flex: 0 0 auto;
+  margin: 0;
+  padding: 0 24px;
+  background: var(--surface);
+}
+
+.content[data-page-width="full"] :is(.ai-settings-page, .integrations-page) > .settings-layout {
+  min-height: 0;
+  flex: 1 1 auto;
+  grid-template-columns: 300px minmax(0, 1fr);
+  align-items: stretch;
+  gap: 0;
+  overflow: hidden;
+}
+
+.content[data-page-width="full"] :is(.ai-settings-page, .integrations-page) > .settings-layout > .settings-list {
+  min-height: 0;
+  overflow-y: auto;
+  border-block: 0;
+  border-left: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.content[data-page-width="full"] :is(.ai-settings-page, .integrations-page) > .settings-layout > .settings-panel {
+  min-height: 0;
+  overflow-y: auto;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.content[data-page-width="full"] .projects-page > .project-create-form {
+  flex: 0 0 auto;
+  margin: 12px 16px;
+}
+
+.content[data-page-width="full"] .projects-layout {
+  min-height: 0;
+  flex: 1 1 auto;
+  grid-template-columns: 300px minmax(0, 1fr);
+  align-items: stretch;
+  gap: 0;
+  overflow: hidden;
+}
+
+.content[data-page-width="full"] .project-list {
+  min-height: 0;
+  overflow-y: auto;
+  border-block: 0;
+  border-left: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.content[data-page-width="full"] .project-details {
+  min-height: 0;
+  align-content: start;
+  padding: 16px;
+  overflow-y: auto;
+  background: var(--bg);
+}
+
+.content[data-page-width="full"] .project-details-empty {
+  min-height: 0;
+  border: 0;
+  border-radius: 0;
+}
+
+.content[data-page-width="full"] .access-tokens-page > .token-secret {
+  flex: 0 0 auto;
+  margin: 12px 16px;
+}
+
+.content[data-page-width="full"] .access-token-layout {
+  min-height: 0;
+  flex: 1 1 auto;
+  grid-template-columns: 320px minmax(0, 1fr);
+  align-items: stretch;
+  gap: 0;
+  overflow: hidden;
+}
+
+.content[data-page-width="full"] .access-token-form {
+  min-height: 0;
+  overflow-y: auto;
+  border-block: 0;
+  border-left: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.content[data-page-width="full"] .access-token-table {
+  min-height: 0;
+  overflow: auto;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.content[data-page-width="full"]:has(> .roles-page) {
+  padding: 0;
+}
+
+.content[data-page-width="full"] > .roles-page {
+  max-width: none;
+  margin: 0;
+  padding: 0 16px 20px;
+}
+
+.content[data-page-width="full"] .roles-page > .page-toolbar {
+  margin-right: -16px;
+  margin-left: -16px;
+}
+
+.content[data-page-width="full"] .roles-page > .admin-notice {
+  margin: 8px 0;
+}
+
+.content[data-page-width="full"] .roles-page > .role-create-form {
+  margin-top: 16px;
+}
+
+@media (max-width: 850px) {
+  .content[data-page-width="full"]:has(> .reply-templates-page),
+  .content[data-page-width="full"]:has(> .ai-settings-page),
+  .content[data-page-width="full"]:has(> .integrations-page),
+  .content[data-page-width="full"]:has(> .projects-page),
+  .content[data-page-width="full"]:has(> .access-tokens-page) {
+    overflow: auto;
+  }
+
+  .content[data-page-width="full"] > .reply-templates-page,
+  .content[data-page-width="full"] > .ai-settings-page,
+  .content[data-page-width="full"] > .integrations-page,
+  .content[data-page-width="full"] > .projects-page,
+  .content[data-page-width="full"] > .access-tokens-page {
+    height: auto;
+  }
+
+  .content[data-page-width="full"] :is(.ai-settings-page, .integrations-page) > .settings-layout,
+  .content[data-page-width="full"] .projects-layout,
+  .content[data-page-width="full"] .access-token-layout {
+    min-height: 0;
+    flex: 0 0 auto;
+    grid-template-columns: minmax(0, 1fr);
+    overflow: visible;
+  }
+
+  .content[data-page-width="full"] .reply-templates-layout {
+    flex: 0 0 auto;
+  }
+
+  .content[data-page-width="full"] .reply-templates-list ul {
+    max-height: 320px;
+    flex: 0 1 auto;
+  }
+
+  .content[data-page-width="full"] .reply-templates-main {
+    overflow: visible;
+  }
+
+  .content[data-page-width="full"] :is(.ai-settings-page, .integrations-page) > .settings-layout > .settings-list,
+  .content[data-page-width="full"] :is(.ai-settings-page, .integrations-page) > .settings-layout > .settings-panel,
+  .content[data-page-width="full"] .project-list,
+  .content[data-page-width="full"] .project-details,
+  .content[data-page-width="full"] .access-token-form,
+  .content[data-page-width="full"] .access-token-table {
+    overflow: visible;
+  }
+}
+
+@media (max-width: 640px) {
+  .content[data-page-width="full"] :is(
+    .reply-templates-page,
+    .ai-settings-page,
+    .integrations-page,
+    .projects-page,
+    .roles-page,
+    .access-tokens-page
+  ) > .page-toolbar {
+    align-items: stretch;
+    padding: 12px 14px;
+  }
+
+  .content[data-page-width="full"] .ai-settings-page > .section-tabs {
+    padding: 0 14px;
+  }
+
+  .content[data-page-width="full"] > .roles-page {
+    padding-right: 12px;
+    padding-left: 12px;
+  }
+
+  .content[data-page-width="full"] .roles-page > .page-toolbar {
+    margin-right: -12px;
+    margin-left: -12px;
+  }
+}

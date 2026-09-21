@@ -1,0 +1,57 @@
+#!/usr/bin/env python3
+"""Create a configuration-only server install bundle from an explicit allowlist."""
+import hashlib
+import io
+from pathlib import Path
+import sys
+import tarfile
+
+LOCAL_FILES = (
+    "provision", "render-config.py", "configure-docker.py", "Config.lite.toml.template",
+    "lite-release.py", "tz-lite-deploy", "tz-lite-github-ssh",
+    "lite-ai-release.py", "tz-lite-ai-deploy",
+    "sshd-deploy.conf", "nginx-global.conf", "nginx-http.conf", "nginx-https.conf",
+    "tz-lite-enable-https", "tz-lite-certbot-deploy",
+)
+SHARED_FILES = (
+    "tz-api.service", "tz-worker.service", "tz-redis.service",
+    "tz-redis.conf", "tz-ai-runtime.conf", "clamav-daemon.socket.conf",
+    "tz-proxy.conf",
+)
+
+
+def main():
+    if len(sys.argv) != 2:
+        raise ValueError("usage: package-provision <output-directory>")
+    source = Path(__file__).resolve().parent
+    files = {name: source / name for name in LOCAL_FILES}
+    files.update({f"shared/{name}": source / "shared" / name for name in SHARED_FILES})
+    for name, path in files.items():
+        if not path.is_file() or path.is_symlink():
+            raise ValueError(f"missing/unsafe installation file: {name}")
+    output = Path(sys.argv[1])
+    output.mkdir(parents=True, exist_ok=True)
+    archive = output / "tz-lite-install.tar.gz"
+    checksum = output / "tz-lite-install.tar.gz.sha256"
+    if archive.exists() or checksum.exists():
+        raise ValueError("output bundle already exists")
+    with tarfile.open(archive, "x:gz", format=tarfile.USTAR_FORMAT) as bundle:
+        for name, path in sorted(files.items()):
+            content = path.read_bytes()
+            info = bundle.gettarinfo(str(path), arcname=f"tz-lite-install/{name}")
+            info.uid = info.gid = 0
+            info.uname = info.gname = "root"
+            info.mode = 0o644
+            info.mtime = 0
+            info.size = len(content)
+            bundle.addfile(info, io.BytesIO(content))
+    checksum.write_text(f"{hashlib.sha256(archive.read_bytes()).hexdigest()}  {archive.name}\n")
+    print(archive)
+    print(checksum)
+
+
+if __name__ == "__main__":
+    try:
+        main()
+    except (OSError, ValueError) as error:
+        raise SystemExit(f"Lite install bundle: {error}")

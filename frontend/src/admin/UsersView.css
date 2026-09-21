@@ -1,0 +1,10 @@
+.users-page { display: flex; flex-direction: column; gap: 16px; }
+.project-user-mode { display: flex; flex-wrap: wrap; gap: 8px 20px; margin: 14px 14px 0; padding: 0; border: 0; }
+.project-user-mode legend { margin-bottom: 8px; color: var(--text-secondary); font-size: 13px; }
+.project-user-mode label { display: inline-flex; align-items: center; gap: 7px; font-size: 13px; }
+.project-user-mode input[type="radio"] { width: 16px; height: 16px; margin: 0; accent-color: var(--accent); }
+.project-member-form .project-password-help { color: var(--text-muted); font-size: 12px; }
+.project-member-form--create > .project-password-help { grid-column: 1 / -1; margin: 0; }
+.project-access-section > .project-access-feedback { margin: 12px 14px; }
+.project-access-retry { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.project-access-retry p { margin: 0; }

@@ -1,0 +1,99 @@
+.sidebar-bell { display: flex; flex: 0 0 auto; }
+
+.sidebar-bell-button {
+  position: relative;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.sidebar-bell-button:hover,
+.sidebar-bell-button[aria-expanded="true"] { border-color: var(--border); background: var(--surface-subtle); color: var(--text); }
+.sidebar-bell-button:focus-visible { outline: 2px solid var(--accent, #3463ff); outline-offset: 2px; }
+
+.sidebar-bell-count {
+  position: absolute;
+  top: 1px;
+  inset-inline-end: 1px;
+  min-width: 15px;
+  height: 15px;
+  padding: 0 3px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: var(--danger, #e5484d);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.sidebar-bell-panel {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 8px;
+  z-index: 40;
+  width: min(320px, calc(100vw - 32px));
+  max-height: calc(100dvh - 120px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  display: grid;
+  gap: 4px;
+  padding: 8px;
+  border: 1px solid var(--border-strong);
+  border-radius: 10px;
+  background: var(--surface);
+  box-shadow: 0 8px 24px var(--shadow);
+}
+
+.sidebar-bell-panel > header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 2px 4px 6px;
+}
+
+.sidebar-bell-panel > header > h2 { margin: 0; font-size: 13px; font-weight: 700; color: var(--text); }
+
+.sidebar-bell-list { display: grid; gap: 2px; max-height: min(340px, 50dvh); overflow-y: auto; overscroll-behavior: contain; }
+
+.sidebar-bell-item { display: flex; align-items: flex-start; gap: 4px; }
+
+.sidebar-bell-item > button:first-child {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: grid;
+  gap: 2px;
+  padding: 7px 8px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+}
+
+.sidebar-bell-item > button:first-child:hover { background: var(--surface-subtle); }
+.sidebar-bell-item strong { font-size: 13px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sidebar-bell-item span { font-size: 11px; color: var(--text-secondary); }
+
+.sidebar-bell-empty { margin: 0; padding: 10px 4px; color: var(--text-secondary); font-size: 12px; }
+
+@media (min-width: 851px) {
+  .sidebar--collapsed .sidebar-bell-button { width: 28px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sidebar-bell-button { transition: none; }
+}

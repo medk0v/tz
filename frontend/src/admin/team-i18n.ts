@@ -1,0 +1,70 @@
+import type { Locale } from "../i18n";
+
+const en = {
+  title: "Team", employees: "Employees", agents: "AI agents", positions: "Job positions", governance: "Teams and responsibility",
+  addEmployee: "Add employee", manageAgents: "Manage AI agents", newPosition: "Add job position",
+  person: "Employee", agent: "AI agent", department: "Department", position: "Job position", allDepartments: "All departments", unassigned: "Not assigned",
+  openKpis: "Open KPI", emptyEmployees: "Add an employee account to assign a job position.", emptyAgents: "Connect an AI agent to assign a job position.", emptyPositions: "No job positions yet.",
+  loading: "Loading…", loadError: "Could not load the team.", retry: "Try again", selectProject: "Select a project to open its team.",
+  assignmentSaved: "Job position assigned.", assignmentError: "Could not assign the job position.",
+  back: "Back to job positions", description: "Description", instructions: "Job description", kpi: "KPI", name: "Position name",
+  responsibilities: "Responsibilities and duties", responsibilitiesHelp: "These duties and the position's department are used to generate KPI proposals.",
+  save: "Save changes", saveDraft: "Save draft", saving: "Saving…", saved: "Changes saved.", draftSaved: "KPI draft saved.", saveError: "Could not save changes.",
+  goal: "Goal", goalPlaceholder: "Respond faster and improve service quality", provider: "Model connection", noProvider: "Connect an active OpenAI or OpenAI-compatible model to generate KPI proposals.", providerError: "Could not load model connections. You can still edit KPI manually.",
+  generate: "Generate KPI", generating: "Generating…", generated: "KPI proposals are ready. Review the targets and save or approve the draft.", generationError: "Could not generate KPI. Your current draft has been kept.", generationHelp: "The current position, department and duties are saved before generating 3–5 proposals.",
+  draft: "KPI draft", approved: "Approved KPI", approvedOn: "Approved on", noApproved: "No KPI have been approved for this position yet.", noDraft: "Generate KPI or add a metric manually.",
+  metric: "Metric", formula: "Calculation", dataSource: "Data source", target: "Target", period: "Evaluation period", owner: "Data owner", addMetric: "Add metric", removeMetric: "Remove metric", actions: "Actions",
+  approve: "Approve", approving: "Approving…", approvalSaved: "KPI approved.", approvalError: "The draft was saved, but KPI approval failed. Try approving again.", approvalHelp: "Fill in every field, including targets, periods and data owners, before approval. Confirm AI suggestions against your team's actual results.",
+  actualsHelp: "This position stores approved KPI definitions. Actual values will be calculated after data sources are connected and verified.",
+  unsaved: "Unsaved changes", discardConfirm: "Discard unsaved team changes?", regenerateConfirm: "Replace the current KPI draft with new AI proposals? Approved KPI will remain available.",
+  requiredName: "Enter a position name before saving or generating KPI.", readOnly: "You can view the approved KPI for your assigned job position.",
+  conflict: "This position was changed elsewhere. Your edits are kept. Reload the latest version before continuing.", reload: "Reload position",
+  requiredInstructions: "Add the position's responsibilities before generating KPI.", modelAccessRequired: "AI management access is required to generate KPI. You can edit and approve KPI manually.",
+};
+type TeamTextKey = keyof typeof en;
+const ru: Record<TeamTextKey, string> = {
+  title: "Команда", employees: "Сотрудники", agents: "ИИ-агенты", positions: "Должности", governance: "Команды и ответственность",
+  addEmployee: "Добавить сотрудника", manageAgents: "Настроить ИИ-агентов", newPosition: "Добавить должность",
+  person: "Сотрудник", agent: "ИИ-агент", department: "Отдел", position: "Должность", allDepartments: "Все отделы", unassigned: "Не назначена",
+  openKpis: "Открыть KPI", emptyEmployees: "Добавьте аккаунт сотрудника, чтобы назначить ему должность.", emptyAgents: "Подключите ИИ-агента, чтобы назначить ему должность.", emptyPositions: "Должностей пока нет.",
+  loading: "Загрузка…", loadError: "Не удалось загрузить команду.", retry: "Повторить", selectProject: "Выберите проект, чтобы открыть его команду.",
+  assignmentSaved: "Должность назначена.", assignmentError: "Не удалось назначить должность.",
+  back: "Назад к должностям", description: "Описание", instructions: "Должностная инструкция", kpi: "KPI", name: "Название должности",
+  responsibilities: "Обязанности и задачи", responsibilitiesHelp: "Эти обязанности и отдел должности используются при генерации KPI.",
+  save: "Сохранить изменения", saveDraft: "Сохранить черновик", saving: "Сохранение…", saved: "Изменения сохранены.", draftSaved: "Черновик KPI сохранён.", saveError: "Не удалось сохранить изменения.",
+  goal: "Цель", goalPlaceholder: "Ускорить ответы и повысить качество обслуживания", provider: "Подключение модели", noProvider: "Подключите активную модель OpenAI или совместимого провайдера для генерации KPI.", providerError: "Не удалось загрузить подключения моделей. KPI можно редактировать вручную.",
+  generate: "Сгенерировать KPI", generating: "Генерация…", generated: "Предложения KPI готовы. Проверьте целевые значения и сохраните или утвердите черновик.", generationError: "Не удалось сгенерировать KPI. Текущий черновик сохранён.", generationHelp: "Перед генерацией 3–5 предложений система сохраняет текущую должность, отдел и обязанности.",
+  draft: "Черновик KPI", approved: "Утверждённые KPI", approvedOn: "Утверждены", noApproved: "Для этой должности пока нет утверждённых KPI.", noDraft: "Сгенерируйте KPI или добавьте показатель вручную.",
+  metric: "Показатель", formula: "Как рассчитывать", dataSource: "Источник данных", target: "Целевое значение", period: "Период оценки", owner: "Ответственный за данные", addMetric: "Добавить показатель", removeMetric: "Удалить показатель", actions: "Действия",
+  approve: "Утвердить", approving: "Утверждение…", approvalSaved: "KPI утверждены.", approvalError: "Черновик сохранён, но утвердить KPI не удалось. Повторите утверждение.", approvalHelp: "Перед утверждением заполните все поля, включая цели, периоды и ответственных за данные. Подтвердите предложения ИИ с учётом реальных результатов команды.",
+  actualsHelp: "В должности хранится утверждённый набор KPI. Расчёт фактических значений появится после подключения и проверки источников данных.",
+  unsaved: "Несохранённые изменения", discardConfirm: "Отменить несохранённые изменения в разделе команды?", regenerateConfirm: "Заменить текущий черновик KPI новыми предложениями ИИ? Утверждённые KPI останутся доступны.",
+  requiredName: "Укажите название должности перед сохранением или генерацией KPI.", readOnly: "Вам доступны утверждённые KPI назначенной должности.",
+  conflict: "Должность изменена в другом окне. Ваши правки сохранены в форме. Загрузите актуальную версию, чтобы продолжить.", reload: "Загрузить актуальную версию",
+  requiredInstructions: "Добавьте обязанности должности перед генерацией KPI.", modelAccessRequired: "Для генерации KPI нужен доступ к управлению ИИ. Вы можете редактировать и утверждать KPI вручную.",
+};
+const ro: Record<TeamTextKey, string> = {
+  title: "Echipă", employees: "Angajați", agents: "Agenți AI", positions: "Posturi", governance: "Echipe și responsabilități",
+  addEmployee: "Adaugă angajat", manageAgents: "Configurează agenții AI", newPosition: "Adaugă post",
+  person: "Angajat", agent: "Agent AI", department: "Departament", position: "Post", allDepartments: "Toate departamentele", unassigned: "Neatribuit",
+  openKpis: "Deschide KPI", emptyEmployees: "Adăugați un cont de angajat pentru a-i atribui un post.", emptyAgents: "Conectați un agent AI pentru a-i atribui un post.", emptyPositions: "Nu există posturi încă.",
+  loading: "Se încarcă…", loadError: "Echipa nu a putut fi încărcată.", retry: "Reîncearcă", selectProject: "Selectați un proiect pentru a deschide echipa.",
+  assignmentSaved: "Postul a fost atribuit.", assignmentError: "Postul nu a putut fi atribuit.",
+  back: "Înapoi la posturi", description: "Descriere", instructions: "Fișa postului", kpi: "KPI", name: "Denumirea postului",
+  responsibilities: "Responsabilități și sarcini", responsibilitiesHelp: "Aceste responsabilități și departamentul postului sunt folosite pentru generarea KPI.",
+  save: "Salvează modificările", saveDraft: "Salvează schița", saving: "Se salvează…", saved: "Modificările au fost salvate.", draftSaved: "Schița KPI a fost salvată.", saveError: "Modificările nu au putut fi salvate.",
+  goal: "Obiectiv", goalPlaceholder: "Răspunsuri mai rapide și servicii de calitate mai bună", provider: "Conexiunea modelului", noProvider: "Conectați un model OpenAI activ sau un furnizor compatibil pentru a genera KPI.", providerError: "Conexiunile modelelor nu au putut fi încărcate. Puteți edita KPI manual.",
+  generate: "Generează KPI", generating: "Se generează…", generated: "Propunerile KPI sunt gata. Verificați țintele și salvați sau aprobați schița.", generationError: "KPI nu au putut fi generați. Schița curentă a fost păstrată.", generationHelp: "Postul, departamentul și responsabilitățile curente sunt salvate înainte de generarea a 3–5 propuneri.",
+  draft: "Schiță KPI", approved: "KPI aprobați", approvedOn: "Aprobați la", noApproved: "Nu există încă KPI aprobați pentru acest post.", noDraft: "Generați KPI sau adăugați manual un indicator.",
+  metric: "Indicator", formula: "Mod de calcul", dataSource: "Sursa datelor", target: "Valoare țintă", period: "Perioada de evaluare", owner: "Responsabil de date", addMetric: "Adaugă indicator", removeMetric: "Elimină indicatorul", actions: "Acțiuni",
+  approve: "Aprobă", approving: "Se aprobă…", approvalSaved: "KPI au fost aprobați.", approvalError: "Schița a fost salvată, dar aprobarea KPI a eșuat. Încercați din nou aprobarea.", approvalHelp: "Completați toate câmpurile, inclusiv țintele, perioadele și responsabilii de date, înainte de aprobare. Confirmați propunerile AI pe baza rezultatelor reale ale echipei.",
+  actualsHelp: "Postul păstrează setul de KPI aprobați. Valorile efective vor fi calculate după conectarea și verificarea surselor de date.",
+  unsaved: "Modificări nesalvate", discardConfirm: "Renunțați la modificările nesalvate din secțiunea echipei?", regenerateConfirm: "Înlocuiți schița KPI curentă cu propuneri AI noi? KPI aprobați rămân disponibili.",
+  requiredName: "Introduceți denumirea postului înainte de salvare sau generare KPI.", readOnly: "Puteți consulta KPI aprobați pentru postul atribuit.",
+  conflict: "Postul a fost modificat în altă fereastră. Modificările dvs. sunt păstrate în formular. Încărcați versiunea actuală pentru a continua.", reload: "Încarcă versiunea actuală",
+  requiredInstructions: "Adăugați responsabilitățile postului înainte de a genera KPI.", modelAccessRequired: "Generarea KPI necesită acces la gestionarea AI. Puteți edita și aproba KPI manual.",
+};
+export function teamText(locale: Locale) {
+  const messages = locale === "ru" ? ru : locale === "ro" ? ro : en;
+  return (key: TeamTextKey): string => messages[key];
+}

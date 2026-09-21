@@ -1,0 +1,209 @@
+.settings-page-sections {
+  max-width: 920px;
+  display: grid;
+  gap: 18px;
+}
+
+.settings-page-section {
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface);
+  box-shadow: 0 2px 8px var(--shadow);
+}
+
+.settings-page-section > header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 13px 18px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface-subtle);
+}
+
+.settings-page-section > header svg { flex: 0 0 auto; color: var(--text-muted); }
+.settings-page-section h2 { margin: 0; color: var(--text); font-size: 15px; font-weight: 680; }
+
+.settings-page-row {
+  display: grid;
+  grid-template-columns: minmax(170px, 250px) minmax(0, 1fr);
+  align-items: center;
+  gap: 12px 24px;
+  padding: 16px 18px;
+}
+
+.settings-page-row + .settings-page-row { border-top: 1px solid var(--border); }
+.settings-page-row--stacked { grid-template-columns: minmax(0, 1fr); }
+.settings-page-row-text { min-width: 0; }
+.settings-page-row-label { color: var(--text); font-size: 13px; font-weight: 650; }
+.settings-page-row-hint,
+.settings-page-row-note { margin: 3px 0 0; color: var(--text-muted); font-size: 12px; line-height: 1.45; }
+.settings-page-row-note { color: var(--danger); }
+.settings-page-row-control { min-width: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+
+/* Radios keep native keyboard behavior; the label draws the control. */
+.settings-page-choice input,
+.settings-page-palette input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.settings-page-choices {
+  position: relative;
+  isolation: isolate;
+  max-width: 100%;
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 3px;
+  padding: 3px;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  background: var(--surface-subtle);
+}
+
+/* The chosen label's box, measured by the group, so one highlight can travel between choices. */
+.settings-page-choices::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  top: 0;
+  left: 0;
+  width: var(--choice-width, 0);
+  height: var(--choice-height, 0);
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--accent) 12%, var(--surface));
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 45%, transparent);
+  opacity: 0;
+  translate: var(--choice-x, 0) var(--choice-y, 0);
+  transition: translate 200ms var(--cabinet-motion-ease, ease), width 200ms var(--cabinet-motion-ease, ease),
+    height 200ms var(--cabinet-motion-ease, ease), opacity 150ms ease;
+  pointer-events: none;
+}
+
+.settings-page-choices[data-marker="on"]::before { opacity: 1; }
+
+.settings-page-choice {
+  position: relative;
+  min-height: 32px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 12px;
+  border-radius: 6px;
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 150ms ease, color 150ms ease, box-shadow 150ms ease, transform 150ms ease;
+}
+
+/* The chosen label leaves its background to the travelling highlight. */
+.settings-page-choice:hover:not(:has(input:checked)) { background: var(--surface-strong); color: var(--text); }
+.settings-page-choice:active:not(:has(input:disabled)) { transform: scale(.97); }
+.settings-page-choice small { color: var(--text-muted); font-size: 12px; font-weight: 500; font-variant-numeric: tabular-nums; }
+.settings-page-choice svg { flex: 0 0 auto; color: var(--text-muted); }
+
+.settings-page-choice:has(input:checked) { color: var(--text); }
+
+/* Until the highlight has a box to sit in, the label draws its own. */
+.settings-page-choices:not([data-marker="on"]) .settings-page-choice:has(input:checked) {
+  background: color-mix(in srgb, var(--accent) 12%, var(--surface));
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 45%, transparent);
+}
+
+.settings-page-choice:has(input:checked) svg { color: var(--accent); }
+
+.settings-page-choice:has(input:focus-visible),
+.settings-page-palette:has(input:focus-visible) {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.settings-page-palettes {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(148px, 1fr));
+  gap: 8px;
+}
+
+.settings-page-palette {
+  position: relative;
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  background: var(--surface);
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 150ms ease, border-color 150ms ease, box-shadow 150ms ease;
+}
+
+.settings-page-palette:hover { border-color: var(--border-strong); background: var(--surface-subtle); }
+.settings-page-palette > svg { flex: 0 0 auto; margin-left: auto; color: var(--accent); }
+
+.settings-page-palette:has(input:checked) {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 6%, var(--surface));
+  box-shadow: inset 0 0 0 1px var(--accent);
+}
+
+/* A project that sets its own colors locks these choices. */
+.settings-page-palette:has(input:disabled),
+.settings-page-choice:has(input:disabled) { cursor: default; }
+.settings-page-palette:has(input:disabled):hover { border-color: var(--border); background: var(--surface); }
+.settings-page-choice:has(input:disabled):hover { background: transparent; color: var(--text-secondary); }
+.settings-page-choice:has(input:disabled:checked):hover { color: var(--text); }
+.settings-page-palette:has(input:disabled:not(:checked)),
+.settings-page-choice:has(input:disabled:not(:checked)) { opacity: .5; }
+
+.settings-page-swatch {
+  width: 24px;
+  height: 24px;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--swatch-base) 0 50%, var(--swatch-accent) 50% 100%);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .22), 0 0 0 1px var(--border-strong);
+}
+
+.settings-page-language { width: min(100%, 260px); }
+.settings-page-reset { display: inline-flex; align-items: center; gap: 7px; }
+
+.settings-page-example {
+  margin: 0;
+  padding: 12px 18px 14px;
+  border-top: 1px solid var(--border);
+  background: var(--surface-subtle);
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+.settings-page-sound { min-width: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.settings-page-sound select { width: auto; min-width: 220px; max-width: 100%; font-size: 13px; }
+
+/* The switch itself lives in ToggleSwitch.css, beside its component. */
+
+@media (max-width: 720px) {
+  .settings-page-row { grid-template-columns: minmax(0, 1fr); gap: 10px; padding: 14px; }
+  .settings-page-section > header { padding: 12px 14px; }
+  .settings-page-example { padding: 12px 14px; }
+  .settings-page-palettes { grid-template-columns: repeat(auto-fill, minmax(132px, 1fr)); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .settings-page-choices::before,
+  .settings-page-choice,
+  .settings-page-palette { transition: none; }
+  .settings-page-choice:active:not(:has(input:disabled)) { transform: none; }
+}

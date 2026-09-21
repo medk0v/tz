@@ -1,0 +1,79 @@
+.integrations-layout { grid-template-columns: 290px minmax(0, 920px); }
+.integrations-editor-panel { min-height: 260px; }
+.integrations-form { gap: 18px; }
+.integration-boundary-note,
+.integration-security-note { margin: 0; padding: 10px 12px; border-left: 3px solid var(--border-strong); background: var(--surface-subtle); color: var(--text-muted); font-size: 12px; line-height: 1.5; }
+.integration-form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.integration-form-grid > label,
+.integration-action-fields > label { min-width: 0; }
+.integration-form-grid label small,
+.integration-action-fields label small { color: var(--text-muted); font-size: 11px; line-height: 1.45; }
+.integration-form-grid input[aria-invalid="true"],
+.integration-action-fields input[aria-invalid="true"] { border-color: var(--danger); }
+.integration-wide-field { grid-column: 1 / -1; }
+.integration-actions { display: grid; gap: 12px; padding: 13px; border: 1px solid var(--border); border-radius: 7px; }
+.integration-actions > header { display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; }
+.integration-actions h3 { margin: 0; color: var(--text); font-size: 13px; font-weight: 650; }
+.integration-actions header p { max-width: 660px; margin: 4px 0 0; color: var(--text-muted); font-size: 11px; line-height: 1.45; }
+.integration-actions .secondary-button { min-height: 34px; flex: 0 0 auto; padding: 0 10px; }
+.integration-action-list { display: grid; gap: 10px; }
+.integration-action { overflow: hidden; border: 1px solid var(--border); border-radius: 7px; background: var(--surface); }
+.integration-action > header { min-height: 42px; display: grid; grid-template-columns: auto minmax(0, 1fr) 36px; align-items: center; gap: 9px; padding: 0 10px 0 12px; border-bottom: 1px solid var(--border); background: var(--surface-subtle); }
+.integration-action > header > strong { color: var(--text-secondary); font-family: "SFMono-Regular", Consolas, monospace; font-size: 11px; }
+.integration-action > header > span { color: var(--text-muted); font-size: 12px; }
+.integration-action > header .danger-icon-button { width: 32px; height: 32px; }
+.integration-action-fields { display: grid; grid-template-columns: minmax(150px, .7fr) minmax(190px, 1.3fr); gap: 12px; padding: 12px; }
+.integration-agents { display: grid; margin: 0; padding: 0; border: 1px solid var(--border); border-radius: 7px; }
+.integration-agents legend { margin-left: 10px; padding: 0 5px; color: var(--text-secondary); font-size: 12px; font-weight: 650; }
+.integration-agents > label { display: flex; align-items: flex-start; gap: 9px; padding: 10px 12px; border-bottom: 1px solid var(--border); color: var(--text); }
+.integration-agents > label:last-of-type { border-bottom: 0; }
+.integration-agents > label:has(input:disabled) { cursor: not-allowed; opacity: .62; }
+.integration-agents input { width: 16px; height: 16px; flex: 0 0 auto; margin-top: 1px; accent-color: var(--accent); }
+.integration-agents label > span { display: grid; gap: 2px; }
+.integration-agents label strong { font-size: 13px; font-weight: 620; }
+.integration-agents label small { color: var(--text-muted); font-size: 11px; font-weight: 400; line-height: 1.4; }
+.integration-agents p { margin: 0; padding: 11px 12px; color: var(--text-muted); font-size: 12px; }
+.integration-form-actions { display: flex; align-items: center; gap: 12px; }
+
+/* Match the knowledge and reply-template workspaces. */
+.integrations-page .integrations-layout { grid-template-columns: minmax(240px, 300px) minmax(0, 1fr); gap: 0; align-items: start; overflow: hidden; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); }
+.integrations-page .settings-list { align-self: stretch; min-width: 0; border: 0; border-right: 1px solid var(--border); border-radius: 0; background: var(--surface); }
+.integrations-page .integration-list-heading { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; padding: 18px 16px; border-bottom: 1px solid var(--border); }
+.integrations-page .integration-list-heading h2 { margin: 0; color: var(--text); font-size: 14px; }
+.integrations-page .integration-list-heading span { color: var(--text-muted); font-size: 12px; }
+.integrations-page .settings-row { width: 100%; min-height: 78px; gap: 7px; padding: 16px; border-bottom: 1px solid var(--border); border-radius: 0; text-align: left; }
+.integrations-page .settings-row strong { overflow-wrap: anywhere; font-size: 14px; }
+.integrations-page .settings-row > span { color: var(--text-muted); font-size: 12px; line-height: 1.5; }
+.integrations-page .settings-row--active { background: color-mix(in srgb, var(--accent) 8%, var(--surface)); box-shadow: inset 3px 0 var(--accent); }
+.integrations-page .integrations-editor-panel { min-width: 0; border: 0; border-radius: 0; box-shadow: none; }
+.integrations-page .integrations-editor-panel > form > header { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; padding: 20px 24px; border-bottom: 1px solid var(--border); background: var(--surface-subtle); }
+.integrations-page .integrations-editor-panel > form > header h2 { margin: 0; min-width: 0; overflow-wrap: anywhere; color: var(--text); font-size: 18px; }
+.integrations-page .integrations-editor-panel > form > header > span { color: var(--text-muted); font-size: 12px; }
+.integrations-page .integrations-form { display: grid; gap: 24px; padding: 24px; }
+.integrations-page .integration-form-grid { gap: 18px; align-items: start; }
+.integrations-page .integration-form-grid > label, .integrations-page .integration-action-fields > label { display: grid; gap: 7px; color: var(--text-secondary); font-size: 13px; }
+.integrations-page .integration-form-grid input, .integrations-page .integration-form-grid select, .integrations-page .integration-form-grid textarea, .integrations-page .integration-action-fields input, .integrations-page .integration-action-fields textarea { width: 100%; min-width: 0; }
+.integrations-page .integration-form-grid textarea, .integrations-page .integration-action-fields textarea { resize: vertical; }
+.integrations-page .integration-actions { gap: 16px; padding: 20px 0 0; border: 0; border-top: 1px solid var(--border); border-radius: 0; }
+.integrations-page .integration-actions h3 { font-size: 14px; }
+.integrations-page .integration-actions header p, .integrations-page .integration-form-grid label small, .integrations-page .integration-action-fields label small { font-size: 12px; }
+.integrations-page .integration-action-fields { gap: 16px; padding: 16px; }
+.integrations-page .integration-agents { border-radius: 6px; }
+.integrations-page .integration-agents legend { font-size: 14px; }
+.integrations-page .integration-agents > label { padding: 12px 16px; }
+.integrations-page .integration-form-actions { flex-wrap: wrap; padding-top: 20px; border-top: 1px solid var(--border); }
+.integrations-page .integrations-editor-panel > .empty-state { min-height: 320px; padding: 32px; align-content: center; text-align: center; }
+@media (max-width: 1050px) {
+  .integrations-page .integrations-layout { grid-template-columns: 230px minmax(0, 1fr); }
+  .integrations-page .integrations-form { padding: 20px; }
+  .integrations-page .integrations-editor-panel > form > header { align-items: flex-start; flex-direction: column; gap: 6px; padding: 20px; }
+  .integrations-page .integration-action-fields { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 760px) {
+  .integrations-page .page-toolbar { align-items: flex-start; flex-direction: column; }
+  .integrations-page .integrations-layout { grid-template-columns: minmax(0, 1fr); }
+  .integrations-page .settings-list { max-height: 280px; overflow-y: auto; border-right: 0; border-bottom: 1px solid var(--border); }
+  .integrations-page .integrations-form { padding: 16px; }
+  .integrations-page .integration-form-grid { grid-template-columns: minmax(0, 1fr); }
+  .integrations-page .integration-actions > header { align-items: flex-start; flex-direction: column; }
+}

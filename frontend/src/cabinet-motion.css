@@ -1,0 +1,144 @@
+/* Short, event-driven motion. No permanent layers, layout animation or idle loops. */
+:root {
+  --cabinet-motion-fast: 180ms;
+  --cabinet-motion-enter: 340ms;
+  --cabinet-motion-ease: cubic-bezier(.2, .75, .25, 1);
+  /* The preferences popover's own opening, shared so every menu opens alike. */
+  --cabinet-popover-fade: 340ms;
+  --cabinet-popover-move: 380ms;
+  --cabinet-popover-ease: cubic-bezier(.16, 1, .3, 1);
+}
+
+@keyframes cabinet-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes cabinet-reveal {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: none; }
+}
+
+/* The preferences popover's opening, so a menu grows out of the control it belongs to. */
+@keyframes cabinet-dropdown-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes cabinet-dropdown-rise {
+  from { transform: translateY(var(--cabinet-dropdown-shift, -18px)) scale(.94); }
+  to { transform: translateY(0) scale(1); }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  /* Project selection replaces the shell; animate both sides of that boundary. */
+  .project-gate > .project-gate-panel,
+  .shell > .sidebar,
+  .shell > .workspace > .mobile-topbar {
+    animation: cabinet-fade-in var(--cabinet-motion-enter) var(--cabinet-motion-ease);
+  }
+
+  /* Project records arrive after the selection screen has already mounted. */
+  .project-gate :is(.project-gate-list, .project-gate-state, .project-gate-create-form) {
+    animation: cabinet-fade-in var(--cabinet-motion-enter) var(--cabinet-motion-ease);
+  }
+
+  /* Opacity only on page containers: fixed menus keep their viewport positioning. */
+  .shell :is(.page, .conversations-page) {
+    animation: cabinet-fade-in var(--cabinet-motion-enter) var(--cabinet-motion-ease);
+  }
+
+  .shell :is(
+    [role="tabpanel"]:not([hidden]), .settings-panel, .table-panel,
+    .project-details, .reply-template-form, .knowledge-base-settings,
+    .knowledge-article-list, .routing-inspector-content, .contacts-date-range,
+    .agent-profile-group > div:not([hidden]), .empty-state,
+    .task-workspace-layout, .task-execution-header, .task-list-message
+  ):not([data-content-motion]):not(.agent-profile-collapse) {
+    animation: cabinet-reveal var(--cabinet-motion-enter) var(--cabinet-motion-ease);
+  }
+
+  .shell :is(
+    .task-agent-picker, .task-member, .task-coordinator,
+    .task-role-input,
+    .task-step-details, .reply-templates-confirmation,
+    .conversation-details,
+    .agent-backups-content, .agent-api-editor, .agent-api-run-result,
+    .agent-api-secret, .agent-test-editor, .agent-test-history:not([hidden]),
+    .agent-test-instructions-workspace:not([hidden]),
+    .agent-test-instructions-editor, .agent-test-advice,
+    .project-create-form, .conversation-history-list, .blacklist-translation
+  ):not([data-content-motion]) {
+    animation: cabinet-reveal var(--cabinet-motion-enter) var(--cabinet-motion-ease);
+  }
+
+  /* Bound entrance work even when a directory contains hundreds of records. */
+  .shell :is(
+    .task-list-items, .task-agent-picker, .settings-list,
+    .agent-profile-group > div > div, .project-list, .knowledge-article-list ul,
+    .reply-templates-list ul, .task-run-history, .routing-node-list
+  ) > :nth-child(-n + 8),
+  .shell .table-panel tbody > tr:nth-child(-n + 8) {
+    animation: cabinet-fade-in var(--cabinet-motion-enter) var(--cabinet-motion-ease);
+  }
+
+  .shell :is(
+    .section-tabs, .contacts-tabs, .company-tabs,
+    .conversation-queue-tabs, .task-result-tabs, .task-mode-picker
+  ) > button,
+  .shell :is(
+    .settings-row, .agent-profile-row, .agent-profile-group-toggle,
+    .project-list-row, .reply-template-row, .knowledge-article-row,
+    .task-list-row, .task-history-row, .task-icon-button,
+    .task-agent-picker > button, .task-day-choices span
+  ),
+  .project-gate-row {
+    transition: color var(--cabinet-motion-fast) ease,
+      background-color var(--cabinet-motion-fast) ease,
+      border-color var(--cabinet-motion-fast) ease;
+  }
+
+  .shell details[open] > :not(summary) {
+    animation: cabinet-fade-in var(--cabinet-motion-enter) var(--cabinet-motion-ease);
+  }
+
+  .shell .agent-profile-collapse[data-expanded="true"] > div > :nth-child(-n + 8) {
+    animation: cabinet-reveal var(--cabinet-motion-enter) var(--cabinet-motion-ease);
+  }
+
+  .task-add-agent > svg {
+    transition: transform var(--cabinet-motion-enter) var(--cabinet-motion-ease);
+  }
+  .task-add-agent[aria-expanded="true"] > svg { transform: rotate(45deg); }
+
+  /* Dropdown menus open the way the preferences popover does, down to the curve. */
+  :is(.preference-dropdown-options, .ai-reply-suggestion-menu) {
+    transform-origin: var(--cabinet-dropdown-origin, center top);
+    animation:
+      cabinet-dropdown-fade var(--cabinet-popover-fade) var(--cabinet-popover-ease),
+      cabinet-dropdown-rise var(--cabinet-popover-move) var(--cabinet-popover-ease);
+  }
+
+  /* The chevron is the last icon in every dropdown trigger; it turns over while the menu arrives. */
+  :is(.preference-dropdown-trigger, .ai-reply-suggestion-trigger) > svg:last-child {
+    transition: transform var(--cabinet-popover-move) var(--cabinet-popover-ease);
+  }
+  :is(
+    .preference-dropdown-trigger, .ai-reply-suggestion-trigger
+  )[aria-expanded="true"] > svg:last-child { transform: rotate(180deg); }
+
+  /* Segmented switchers: the chosen half slides across instead of blinking over. */
+  .task-mode-picker::before {
+    transition: transform var(--cabinet-motion-fast) var(--cabinet-motion-ease);
+  }
+
+  /* The theme and width switchers keep a highlight per button, so it crossfades. */
+  .theme-option {
+    transition: color var(--cabinet-motion-fast) ease,
+      background-color var(--cabinet-motion-fast) ease,
+      box-shadow var(--cabinet-motion-fast) ease,
+      transform var(--cabinet-motion-fast) ease;
+  }
+  .theme-option:active:not(:disabled) { transform: scale(.97); }
+  .theme-option > svg { transition: color var(--cabinet-motion-fast) ease; }
+}

@@ -1,0 +1,11 @@
+.agent-backups-content { margin-top: 12px; }
+.agent-backups-list { list-style: none; margin: 12px 0 0; padding: 0; max-height: 360px; overflow: auto; }
+.agent-backups-list li { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--border); }
+.agent-backups-details { display: grid; gap: 4px; }
+.agent-backups-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.agent-backups-option { display: flex; align-items: center; gap: 8px; margin-top: 12px; }
+.agent-backups-option input { flex: none; }
+.agent-backups-restored-links { display: grid; gap: 8px; margin-top: 12px; }
+.agent-backups-list li span { font-size: 13px; color: var(--text-muted); }
+
+.ai-profile-edit-fields { border: 0; padding: 0; margin: 0; min-width: 0; }

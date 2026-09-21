@@ -1,0 +1,22 @@
+.project-hierarchy-entry { border-bottom: 1px solid var(--border); }
+.project-hierarchy-entry:last-child { border-bottom: 0; }
+.project-hierarchy-row { display: flex; align-items: stretch; }
+.project-hierarchy-row .project-list-row { flex: 1; min-width: 0; border-bottom: 0; }
+.project-hierarchy-toggle { flex: 0 0 28px; display: grid; place-items: center; padding: 0; border: 0; background: transparent; color: var(--text-muted); }
+.project-hierarchy-toggle:hover { background: var(--surface-subtle); color: var(--text); }
+.project-hierarchy-toggle:focus-visible { outline: 2px solid var(--focus); outline-offset: -2px; }
+.project-hierarchy-row:not(:has(.project-hierarchy-toggle)) { padding-inline-start: 28px; }
+.project-hierarchy-children .project-list-row { padding-inline-start: 54px; }
+.project-gate-row.project-gate-row--subproject { padding-inline-start: 39px; }
+.project-parent-field { min-width: 0; }
+.project-parent-field small { color: var(--text-muted); font-size: 11px; }
+.project-create-form > .project-parent-fields { grid-template-columns: minmax(0, 1fr); padding-block: 0 14px; }
+.project-settings-form .project-parent-field, .project-gate-create-form .project-parent-field { grid-column: 1 / -1; }
+.project-details-header > .project-details-actions { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 8px; }
+.project-subprojects-list { display: grid; padding: 0; margin: 0; list-style: none; }
+.project-subprojects-list button { width: 100%; display: flex; align-items: center; gap: 8px; padding: 12px 14px; border: 0; background: transparent; color: var(--text); text-align: start; }
+.project-subprojects-list button:hover { background: var(--surface-subtle); }
+.project-subprojects-list li + li { border-top: 1px solid var(--border); }
+@media (max-width: 700px) {
+  .project-details-header:has(.project-details-actions) { flex-wrap: wrap; }
+}

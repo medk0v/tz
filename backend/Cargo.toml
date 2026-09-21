@@ -1,0 +1,104 @@
+[package]
+name = "tz-backend"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.88"
+publish = false
+
+[features]
+# Enabled for client-facing / on-prem builds only (see
+# deploy/lite/Dockerfile.release). Turns sensitive string literals wrapped in
+# `obf!` into XOR-encoded blobs so `strings` on the shipped binary does not
+# reveal agent prompts and safety policies. Off by default: our own hosting
+# builds keep plaintext and pay no runtime cost.
+obfuscate = []
+
+[dependencies]
+anyhow = "1.0"
+aes-gcm = "0.10"
+argon2 = "0.5"
+axum = { version = "0.8", features = ["macros", "multipart", "ws"] }
+base64 = "0.22"
+chrono = { version = "0.4", features = ["serde"] }
+chrono-tz = "0.10"
+futures-util = "0.3"
+ipnet = { version = "2.11", features = ["serde"] }
+jsonwebtoken = "9.3"
+lettre = { version = "0.11.22", default-features = false, features = [
+  "builder",
+  "hostname",
+  "ring",
+  "rustls-platform-verifier",
+  "smtp-transport",
+  "tokio1-rustls",
+] }
+libc = "0.2"
+lopdf = { version = "0.44", default-features = false }
+maxminddb = "0.29"
+percent-encoding = "2.3"
+quick-xml = { version = "0.41", features = ["escape-html"] }
+rand = "0.9"
+redis = { version = "0.32", features = ["tokio-comp"] }
+reqwest = { version = "0.12", default-features = false, features = ["json", "rustls-tls"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+sentry = { version = "0.48", default-features = false, features = [
+  "backtrace",
+  "contexts",
+  "panic",
+  "reqwest",
+  "rustls",
+  "tracing",
+] }
+sha2 = "0.10"
+sqlx = { version = "0.8", features = [
+  "chrono",
+  "json",
+  "macros",
+  "migrate",
+  "postgres",
+  "runtime-tokio-rustls",
+  "uuid",
+] }
+thiserror = "2.0"
+tokio = { version = "1.47", features = ["full"] }
+tokio-util = { version = "0.7", features = ["io"] }
+toml = "0.9"
+tower-http = { version = "0.6", features = ["cors", "request-id", "trace"] }
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter", "json"] }
+url = { version = "2.5", features = ["serde"] }
+uuid = { version = "1.18", features = ["serde", "v7"] }
+woothee = "0.13"
+zip = { version = "8.6", default-features = false, features = ["deflate-flate2-zlib-rs"] }
+
+[dev-dependencies]
+tokio = { version = "1.47", features = ["test-util"] }
+tower = { version = "0.5", features = ["util"] }
+
+[lints.rust]
+unsafe_code = "forbid"
+
+[lints.clippy]
+all = { level = "deny", priority = -1 }
+pedantic = { level = "deny", priority = -1 }
+must_use_candidate = "allow"
+needless_pass_by_value = "allow"
+needless_raw_string_hashes = "allow"
+struct_field_names = "allow"
+too_many_lines = "allow"
+unnested_or_patterns = "allow"
+unused_self = "allow"
+
+# Client-facing / on-prem release profile. Inherits our normal `release` so our
+# own hosting build (`cargo build --release`) is untouched, and layers on binary
+# hardening for builds shipped to a customer-controlled server:
+#   strip          -> removes symbol names (no nm / symbolicated backtraces)
+#   lto = "fat"    -> whole-program inlining/merging, harder to follow
+#   codegen-units  -> maximal cross-module optimization (also shrinks the binary)
+# Build with: cargo build --profile release-hardened --features obfuscate
+[profile.release-hardened]
+inherits = "release"
+strip = true
+lto = "fat"
+codegen-units = 1

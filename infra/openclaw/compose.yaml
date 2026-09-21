@@ -1,0 +1,180 @@
+name: support-openclaw
+
+services:
+  openclaw-gateway:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        OPENCLAW_BASE_IMAGE: ${OPENCLAW_IMAGE:?OPENCLAW_IMAGE is required}
+    image: support-openclaw:local
+    depends_on:
+      shell-runner:
+        condition: service_healthy
+      browser-runner:
+        condition: service_healthy
+    env_file:
+      - .env
+    environment:
+      HOME: /home/node
+      OPENCLAW_HOME: /home/node
+      OPENCLAW_STATE_DIR: /home/node/.openclaw
+      OPENCLAW_CONFIG_PATH: /home/node/.openclaw/openclaw.json
+      OPENCLAW_CONFIG_DIR: /home/node/.openclaw
+      OPENCLAW_WORKSPACE_DIR: /home/node/.openclaw/workspace
+      OPENCLAW_GATEWAY_TOKEN: ${OPENCLAW_GATEWAY_TOKEN:?OPENCLAW_GATEWAY_TOKEN is required}
+      OPENCLAW_DISABLE_BONJOUR: "1"
+      TZ: ${OPENCLAW_TZ:-Europe/Istanbul}
+    volumes:
+      - ./runtime/state:/home/node/.openclaw
+      - ./runtime/workspace:/home/node/.openclaw/workspace
+      - ./runtime/auth:/home/node/.config/openclaw
+      - type: bind
+        source: ${OPENCLAW_GRANT_HOST_DIR:-./runtime/agent-secrets}
+        target: /run/support-agent-secrets
+        read_only: true
+        bind:
+          create_host_path: true
+      - type: bind
+        source: ${OPENCLAW_ACTION_HOST_DIR:-./runtime/agent-actions}
+        target: /run/support-agent-actions
+        bind:
+          create_host_path: true
+      - type: bind
+        source: ${OPENCLAW_SHELL_HOST_DIR:-./runtime/shell}
+        target: /run/support-shell
+        read_only: true
+        bind:
+          create_host_path: true
+      - browser-runtime:/run/support-browser:ro
+    group_add:
+      - "${OPENCLAW_GRANT_GID:-1000}"
+    networks:
+      - default
+      - support-ai
+    ports:
+      - "127.0.0.1:18789:18789"
+    cap_drop:
+      - NET_ADMIN
+      - NET_RAW
+    security_opt:
+      - no-new-privileges:true
+    init: true
+    restart: unless-stopped
+    command:
+      - node
+      - dist/index.js
+      - gateway
+      - --bind
+      - lan
+      - --port
+      - "18789"
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - -e
+        - "fetch('http://127.0.0.1:18789/healthz').then((response)=>process.exit(response.ok?0:1)).catch(()=>process.exit(1))"
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: "3"
+
+  browser-runner:
+    build:
+      context: .
+      dockerfile: Dockerfile.browser
+    image: support-openclaw-browser:local
+    user: "1000:1000"
+    environment:
+      SUPPORT_BROWSER_CONCURRENCY: ${SUPPORT_BROWSER_CONCURRENCY:-2}
+    volumes:
+      - browser-runtime:/run/support-browser
+    network_mode: none
+    read_only: true
+    tmpfs:
+      - /tmp:rw,nosuid,nodev,size=256m,mode=1777
+      - /dev/shm:rw,nosuid,nodev,noexec,size=128m,mode=1777
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    pids_limit: 256
+    mem_limit: 768m
+    cpus: 2.0
+    init: true
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "node", "-e", "const fs=require('node:fs');process.exit(fs.statSync('/run/support-browser/runner.sock').isSocket()?0:1)"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 5s
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: "3"
+
+  shell-runner:
+    image: support-openclaw:local
+    user: "0:0"
+    environment:
+      OPENCLAW_GRANT_GID: ${OPENCLAW_GRANT_GID:-1000}
+    volumes:
+      - type: bind
+        source: ${OPENCLAW_SHELL_HOST_DIR:-./runtime/shell}
+        target: /run/support-shell
+        bind:
+          create_host_path: true
+    network_mode: none
+    read_only: true
+    tmpfs:
+      - /tmp:rw,nosuid,nodev,noexec,size=64m,mode=0755
+      - /dev/shm:rw,nosuid,nodev,noexec,size=1m,mode=0755
+    cap_drop:
+      - ALL
+    cap_add:
+      - CHOWN
+      - KILL
+      - SETGID
+      - SETUID
+    security_opt:
+      - no-new-privileges:true
+    pids_limit: 64
+    mem_limit: 256m
+    cpus: 1.0
+    init: true
+    restart: unless-stopped
+    entrypoint:
+      - node
+    command:
+      - /usr/local/lib/support-shell-runner.mjs
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - -e
+        - "const fs=require('node:fs');process.exit(fs.statSync('/run/support-shell/runner.sock').isSocket()?0:1)"
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 5s
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: "3"
+
+volumes:
+  browser-runtime:
+
+networks:
+  support-ai:
+    name: support-ai
+    external: true

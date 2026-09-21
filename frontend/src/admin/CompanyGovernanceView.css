@@ -1,0 +1,43 @@
+.company-governance { min-width: 0; }
+.company-governance .secondary-button, .company-governance .primary-button { min-height: 32px; gap: 6px; padding: 6px 10px; font-size: 12px; }
+.company-governance-section { padding: 18px; border-top: 1px solid var(--border); }
+.company-governance-section > h4, .company-governance-heading h4 { margin: 0; font-size: 14px; }
+.company-governance-section > h4 { margin-bottom: 16px; }
+.company-governance-heading { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-bottom: 16px; }
+.company-governance-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; min-width: 0; padding: 0; margin: 0; border: 0; }
+.company-governance-fields > label { display: grid; align-content: start; gap: 6px; min-width: 0; color: var(--text-secondary); font-size: 13px; }
+.company-governance-fields input, .company-governance-fields select, .company-governance-fields textarea { box-sizing: border-box; width: 100%; min-width: 0; }
+.company-governance-fields textarea { resize: vertical; min-height: 64px; }
+.company-governance-wide { grid-column: 1 / -1; }
+.company-governance-help { margin: 8px 0 0; color: var(--text-muted); font-size: 12px; line-height: 1.6; }
+.company-governance-message, .company-governance-feedback { margin: 14px 18px; font-size: 13px; }
+.company-governance-feedback > p { margin: 0 0 10px; line-height: 1.6; }
+.company-governance-workspace { display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 20px; }
+.company-governance-team-list { align-self: start; display: flex; flex-direction: column; border: 1px solid var(--border); border-radius: 6px; overflow: hidden; }
+.company-governance-team-list > button, .company-governance-role-list button { display: grid; gap: 5px; width: 100%; padding: 12px; border: 0; border-radius: 0; background: transparent; color: var(--text); font: inherit; text-align: left; cursor: pointer; overflow-wrap: anywhere; }
+.company-governance-team-list > button + button { border-top: 1px solid var(--border); }
+.company-governance-team-list > button:hover, .company-governance-role-list button:hover { background: var(--surface-subtle); }
+.company-governance-team-list > button[aria-current="true"], .company-governance-role-list button[aria-pressed="true"] { background: var(--surface-subtle); box-shadow: inset 3px 0 var(--accent); }
+.company-governance-team-list strong, .company-governance-role-list strong { font-size: 13px; font-weight: 600; }
+.company-governance-team-list span, .company-governance-role-list span { color: var(--text-muted); font-size: 12px; line-height: 1.5; }
+.company-governance-team-detail { min-width: 0; }
+.company-governance-roles-heading { margin-top: 24px; }
+.company-governance-role-list { padding: 0; margin: 0; list-style: none; border-bottom: 1px solid var(--border); }
+.company-governance-role-list > li { border-top: 1px solid var(--border); }
+.company-governance-role-detail { margin-top: 18px; padding-bottom: 16px; border-bottom: 1px solid var(--border); }
+.company-governance-positions { min-width: 0; margin: 0; padding: 12px; border: 1px solid var(--border); border-radius: 6px; }
+.company-governance-positions legend { padding: 0 4px; color: var(--text-secondary); font-size: 13px; }
+.company-governance-positions > .company-governance-help { margin-top: 0; margin-bottom: 10px; }
+.company-governance-position { display: flex; align-items: flex-start; gap: 8px; padding: 6px 0; font-size: 13px; line-height: 1.5; overflow-wrap: anywhere; }
+.company-governance-position input[type="checkbox"] { width: 15px; height: 15px; margin: 2px 0 0; flex: 0 0 auto; accent-color: var(--accent); }
+.company-governance-invalid { display: block; color: var(--text-muted); font-size: 12px; }
+.company-governance-delete { margin-top: 16px; }
+.company-governance-actions { display: flex; flex-wrap: wrap; gap: 8px; padding: 16px 18px; border-top: 1px solid var(--border); }
+@media (max-width: 900px) {
+  .company-governance-workspace { grid-template-columns: minmax(0, 1fr); }
+  .company-governance-team-list { max-height: 220px; overflow: auto; }
+}
+@media (max-width: 650px) {
+  .company-governance-section { padding: 14px; }
+  .company-governance-fields { grid-template-columns: minmax(0, 1fr); }
+}

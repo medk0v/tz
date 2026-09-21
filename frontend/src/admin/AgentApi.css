@@ -1,0 +1,28 @@
+.ai-assignment.agent-api { min-width: 0; padding: 16px; gap: 12px; }
+.agent-api > button { justify-self: start; }
+.agent-api p, .agent-api h4 { margin: 0; }
+.agent-api-content, .agent-api-editor, .agent-api-key, .agent-api-methods, .agent-api-test, .agent-api-request, .agent-api-history, .agent-api-run-result, .agent-api-secret { display: grid; min-width: 0; gap: 12px; }
+.agent-api-key, .agent-api-methods, .agent-api-editor, .agent-api-request, .agent-api-test, .agent-api-history { border-top: 1px solid var(--border); padding-top: 16px; }
+.agent-api label { display: flex; min-width: 0; flex-direction: column; align-items: stretch; gap: 6px; }
+.agent-api textarea, .agent-api select, .agent-api input:not([type="checkbox"]) { width: 100%; box-sizing: border-box; }
+.agent-api select, .agent-api input:not([type="checkbox"]) { height: 36px; margin: 0; }
+.agent-api label.agent-api-checkbox { flex-direction: row; align-items: center; gap: 8px; }
+.agent-api-fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr)); gap: 12px; }
+.agent-api-toolbar { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; }
+.agent-api-timeout { flex: 0 1 220px; }
+.agent-api-toolbar > button { max-width: 100%; white-space: normal; }
+.agent-api-method-list { display: grid; gap: 0; margin: 0; padding: 0; list-style: none; }
+.agent-api-method-list li { display: flex; align-items: center; gap: 12px; border-bottom: 1px solid var(--border); padding-block: 8px; }
+.agent-api-method-name { display: flex; min-width: 0; flex: 1; flex-wrap: wrap; align-items: center; gap: 8px 12px; padding: 8px; text-align: left; border: 0; background: transparent; color: var(--text-primary); cursor: pointer; }
+.agent-api-method-name[aria-expanded="true"] { background: var(--surface-subtle); }
+.agent-api-method-name code, .agent-api-method-name > span { color: var(--text-secondary); }
+.agent-api code, .agent-api-json, .agent-api pre { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12px; }
+.agent-api code { overflow-wrap: anywhere; }
+.agent-api pre { margin: 0; max-height: 420px; overflow: auto; white-space: pre-wrap; overflow-wrap: anywhere; padding: 12px; background: var(--surface-subtle); border: 1px solid var(--border); border-radius: 6px; }
+.agent-api details { min-width: 0; }
+.agent-api summary { cursor: pointer; padding-block: 8px; }
+.agent-api-history-run { border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+.agent-api-request > button, .agent-api-test > button, .agent-api-secret > button { justify-self: start; }
+.agent-api-run-result { padding-block: 8px; }
+.agent-api-run-result .form-error { display: grid; gap: 8px; }
+.agent-api button:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }

@@ -1,0 +1,59 @@
+.public-notes { min-height: 100dvh; color: var(--text); background: var(--surface); }
+.public-notes-layout { display: grid; grid-template-columns: 238px minmax(0, 1fr); width: 100%; min-height: 100dvh; }
+.public-notes-layout[data-navigation="false"] { grid-template-columns: minmax(0, 1fr); }
+.public-notes-sidebar { padding: 24px 14px; border-inline-end: 1px solid var(--border); }
+.public-notes-search { display: flex; align-items: center; gap: 7px; margin: 0 0 18px 8px; padding: 8px; border: 1px solid var(--border); border-radius: 5px; color: var(--text-muted); }
+.public-notes-search input { min-width: 0; width: 100%; padding: 0; border: 0; outline: 0; background: transparent; color: var(--text); font-size: 12px; }
+.public-notes-search:focus-within { outline: 2px solid var(--focus-ring); }
+.public-notes-sidebar ul { list-style: none; margin: 0; padding: 0; }
+.public-notes-sidebar li button { display: flex; align-items: center; gap: 7px; width: 100%; min-width: 0; padding: 9px 8px; border: 0; border-radius: 5px; background: transparent; color: var(--text-secondary); font-size: 13px; text-align: start; }
+.public-notes-sidebar li button:hover, .public-notes-sidebar li button[aria-current] { background: var(--surface-subtle); color: var(--text); }
+.public-notes-sidebar li button[aria-current] { font-weight: 600; }
+.public-notes-sidebar li button > :first-child { flex-shrink: 0; }
+.public-notes-sidebar li button > span:last-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.public-notes-sidebar > p { color: var(--text-muted); padding: 8px; font-size: 12px; }
+.public-notes-document { min-width: 0; }
+.public-notes-appearance { display: flex; align-items: center; justify-content: flex-end; gap: 8px; padding: 20px 32px 0; }
+.public-notes-appearance > .preference-dropdown { width: 148px; }
+.public-notes-mode { display: flex; border: 1px solid var(--border-strong); border-radius: 6px; overflow: hidden; }
+.public-notes-mode button { display: grid; place-items: center; width: 34px; height: 34px; padding: 0; border: 0; background: var(--surface); color: var(--text-secondary); }
+.public-notes-mode button[aria-pressed="true"] { background: var(--surface-subtle); color: var(--text); }
+.public-notes-mode button:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+.public-notes-document-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 65px; padding: 14px 32px; border-bottom: 1px solid var(--border); }
+.public-notes-document-toolbar > span { font-size: 12px; color: var(--text-muted); }
+.public-notes-document-toolbar button { display: flex; align-items: center; gap: 6px; }
+.public-notes-content { width: 100%; min-width: 0; padding: 32px; }
+.public-notes-title-row { display: flex; align-items: center; gap: 12px; }
+.public-notes-title-row > span { font-size: 30px; }
+.public-notes-title { min-width: 0; width: 100%; margin: 0; padding: 0; border: 0; outline: 0; background: transparent; color: var(--text); font-family: inherit; font-size: 30px; font-weight: 700; line-height: 1.4; overflow-wrap: anywhere; }
+.public-notes-title[readonly]:focus { box-shadow: none; }
+.public-notes-prose { min-height: 0; }
+.public-notes-table-scroll { max-width: 100%; overflow-x: auto; overscroll-behavior-x: contain; }
+.public-notes-prose .public-notes-table-scroll table { display: table; width: 100%; min-width: 0; max-width: none; overflow: visible; }
+.public-notes-prose tbody tr:last-child td { border-bottom: 1px solid var(--border-strong); }
+.public-notes-icon-field { display: flex; align-items: center; gap: 10px; margin: 20px 0; color: var(--text-muted); font-size: 12px; }
+.public-notes-icon-field select { width: auto; min-width: 100px; padding: 6px; border: 1px solid var(--border); border-radius: 5px; background: var(--surface); color: var(--text); }
+.public-notes-gate { width: min(440px, calc(100% - 40px)); margin: 56px auto; }
+.public-notes-gate > svg { color: var(--text-secondary); }
+.public-notes-gate h1 { font-size: 22px; line-height: 1.4; margin: 18px 0 10px; }
+.public-notes-gate > p { color: var(--text-secondary); font-size: 14px; line-height: 1.6; }
+.public-notes-gate form { display: grid; gap: 16px; margin-top: 24px; }
+.public-notes-gate label { display: grid; gap: 8px; font-size: 13px; }
+.public-notes-gate input { width: 100%; padding: 10px 12px; border: 1px solid var(--border-strong); border-radius: 6px; background: var(--surface); color: var(--text); }
+.public-notes-gate form button { justify-self: start; }
+.public-notes-status { padding: 28px; color: var(--text-secondary); font-size: 14px; text-align: center; }
+.public-notes-error { padding: 12px 14px; margin: 16px 24px; border: 1px solid var(--danger-border); border-radius: 5px; color: var(--danger); font-size: 13px; line-height: 1.6; }
+.public-notes-error p { margin: 0 0 10px; }.public-notes-error p:last-child { margin-bottom: 0; }
+.public-notes-gate .public-notes-error { margin: 0; }
+.public-notes-notice { margin: 16px 32px; color: var(--text-secondary); font-size: 13px; }
+.public-notes-draft-actions { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 20px; border-top: 1px solid var(--border); padding-top: 20px; }
+.public-notes-draft-actions > button { display: flex; align-items: center; gap: 6px; font-size: 12px; }
+.public-notes-menu { display: none; }
+@media (max-width: 760px) {
+  .public-notes-layout { display: block; padding: 0; }.public-notes-sidebar { display: none; padding: 14px 18px; border: 0; border-bottom: 1px solid var(--border); max-height: 48dvh; overflow: auto; }
+  .public-notes-appearance { padding: 16px 18px 0; }
+  .public-notes-layout[data-menu-open="true"] .public-notes-sidebar { display: block; }.public-notes-search { margin-left: 0; }
+  .public-notes-menu { display: flex; align-items: center; gap: 8px; margin: 12px 18px; padding: 7px 9px; border: 1px solid var(--border); border-radius: 5px; background: var(--surface); color: var(--text-secondary); font-size: 12px; }
+  .public-notes-document-toolbar { min-height: 54px; padding: 10px 18px; }.public-notes-content { padding: 24px 18px; }.public-notes-title { font-size: 25px; }.public-notes-title-row > span { font-size: 25px; }
+  .public-notes-gate { margin: 36px auto; }.public-notes-gate h1 { font-size: 20px; }.public-notes-error { margin: 14px 18px; }
+}

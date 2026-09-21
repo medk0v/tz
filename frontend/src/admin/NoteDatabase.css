@@ -1,0 +1,86 @@
+.note-database { min-width: 0; margin: 16px 0; border: 1px solid var(--border); border-radius: 6px; background: var(--surface); color: var(--text); font-size: 13px; }
+.note-database-header { display: flex; align-items: flex-start; gap: 8px; padding: 14px 14px 10px; }
+.note-database-header > div { flex: 1; min-width: 0; }
+.note-database-header h3 { margin: 0; font-size: 15px; font-weight: 600; overflow-wrap: anywhere; }
+.note-database-header p { margin: 4px 0 0; color: var(--text-muted); white-space: pre-wrap; overflow-wrap: anywhere; }
+.note-database button, .note-database-dialog button { display: inline-flex; align-items: center; justify-content: center; gap: 5px; border: 1px solid var(--border); border-radius: 4px; background: var(--surface); color: var(--text); min-height: 30px; padding: 5px 8px; font: inherit; cursor: pointer; }
+.note-database button:hover:not(:disabled), .note-database-dialog button:hover:not(:disabled) { background: var(--surface-subtle); }
+.note-database button:disabled, .note-database-dialog button:disabled { opacity: .5; cursor: default; }
+.note-database button:focus-visible, .note-database-dialog button:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+.note-database-dialog button.primary-button { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
+.note-database-dialog button.primary-button:hover:not(:disabled) { filter: brightness(.94); background: var(--accent); }
+.note-database-dialog button.note-database-danger { color: var(--danger); }
+.note-database-toolbar { display: flex; align-items: center; flex-wrap: wrap; gap: 7px; padding: 0 14px 12px; }
+.note-database-toolbar input[type="search"] { width: auto; min-width: 140px; flex: 1; }
+.note-database-view-select { min-width: 130px; max-width: 220px; }
+.note-database input, .note-database select, .note-database-dialog input:not([type="checkbox"]), .note-database-dialog select, .note-database-dialog textarea { border: 1px solid var(--border-strong); border-radius: 4px; background: var(--surface); color: var(--text); font: inherit; padding: 7px 9px; min-width: 0; }
+.note-database input, .note-database select { height: 32px; }
+.note-database input:focus-visible, .note-database select:focus-visible, .note-database-dialog input:focus-visible, .note-database-dialog select:focus-visible, .note-database-dialog textarea:focus-visible { outline: 2px solid var(--focus); outline-offset: 1px; }
+.note-database-scroll { overflow: auto; max-height: 560px; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+.note-database table { table-layout: fixed; border-collapse: separate; border-spacing: 0; width: 100%; }
+.note-database th, .note-database td { border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); text-align: left; padding: 0; height: 37px; background: var(--surface); }
+.note-database th { padding: 7px 10px; background: var(--surface-subtle); font-weight: 500; position: sticky; top: 0; z-index: 2; }
+.note-database th > span { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.note-database th small { display: block; font-weight: 400; color: var(--text-muted); font-size: 10px; padding-top: 2px; }
+.note-database td.is-pinned { z-index: 1; }
+.note-database th.is-pinned { z-index: 3; }
+.note-database tr:last-child td { border-bottom: 0; }
+.note-database th:last-child, .note-database td:last-child { border-right: 0; }
+.note-database .note-database-cell { display: block; padding: 9px 10px; width: 100%; height: 100%; min-height: 37px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; border: 0; border-radius: 0; background: transparent; text-align: left; color: inherit; }
+.note-database a.note-database-cell { color: var(--accent); }
+.note-database th.note-database-row-actions, .note-database td.note-database-row-actions { width: 112px; min-width: 112px; padding: 2px 5px; white-space: nowrap; }
+.note-database-row-actions button { padding: 4px; border: 0; }
+.note-database-pagination { display: flex; align-items: center; gap: 6px; padding: 8px 12px; color: var(--text-muted); }
+.note-database-pagination > span { margin-right: auto; }
+.note-database-empty, .note-database > [role="status"] { padding: 14px; margin: 0; color: var(--text-muted); }
+.note-database-help { color: var(--text-muted); font-size: 12px; line-height: 1.5; }
+.note-database > .note-database-help { margin: 4px 14px 14px; }
+.note-database-help button { margin-left: 8px; }
+.note-database-error { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; color: var(--danger); font-size: 13px; line-height: 1.5; }
+.note-database > .note-database-error { margin: 0 14px 12px; }
+.note-database-dialog { width: min(520px, calc(100vw - 32px)); max-width: none; max-height: min(88vh, 880px); padding: 0; border: 1px solid var(--border-strong); border-radius: 8px; color: var(--text); background: var(--surface); box-shadow: 0 14px 44px #0003; font-size: 13px; }
+.note-database-dialog--wide { width: min(860px, calc(100vw - 32px)); }
+.note-database-dialog::backdrop { background: #0006; }
+.note-database-dialog > header { display: flex; align-items: center; gap: 12px; padding: 14px 18px; border-bottom: 1px solid var(--border); }
+.note-database-dialog h2 { font-size: 17px; line-height: 1.4; font-weight: 600; margin: 0; flex: 1; overflow-wrap: anywhere; }
+.note-database-dialog h3 { font-size: 14px; margin: 0; font-weight: 600; }
+.note-database-dialog-body { padding: 18px; overflow: auto; max-height: calc(88vh - 64px); }
+.note-database-form { display: grid; gap: 15px; }
+.note-database-form > label, .note-database-field { display: grid; gap: 7px; min-width: 0; }
+.note-database-field > span { color: var(--text-secondary); }
+.note-database-form textarea { min-height: 85px; width: 100%; resize: vertical; }
+.note-database-form input:not([type="checkbox"]), .note-database-form select { width: 100%; }
+.note-database-form footer { display: flex; align-items: center; justify-content: flex-end; gap: 10px; padding-top: 12px; border-top: 1px solid var(--border); }
+.note-database-form footer > .note-database-danger { margin-right: auto; }
+.note-database-form fieldset { min-width: 0; margin: 0; padding: 12px; border: 1px solid var(--border); border-radius: 4px; display: grid; gap: 8px; }
+.note-database-form legend { padding: 0 5px; font-weight: 500; }
+.note-database-inline { display: flex; align-items: center; gap: 8px; }
+.note-database-inline > input { flex: 1; min-width: 0; }
+.note-database-inline button[aria-pressed="true"] { border-color: var(--accent); color: var(--accent); }
+.note-database-options { display: flex; flex-direction: column; gap: 7px; }
+.note-database-checks { display: flex; flex-direction: column; gap: 7px; }
+.note-database-checks label, .note-database-check { display: flex; align-items: center; gap: 7px; }
+.note-database-calculated { display: grid; gap: 5px; }
+.note-database-calculated small { color: var(--text-muted); }
+.note-database-options label, .note-database-checkbox { display: flex; align-items: center; gap: 7px; }
+.note-database-options input[type="checkbox"], .note-database-dialog input[type="checkbox"] { width: 15px; height: 15px; margin: 0; accent-color: var(--accent); }
+.note-database-relation { display: grid; gap: 8px; }
+.note-database-relation-list { display: grid; gap: 8px; max-height: 240px; overflow: auto; }
+.note-database-relation-list label { display: flex; align-items: center; gap: 8px; overflow-wrap: anywhere; }
+.note-database-relation-list .note-database-inline > label { flex: 1; min-width: 0; }
+.note-database-management-list { list-style: none; margin: 0 0 12px; padding: 0; }
+.note-database-management-list li { display: flex; align-items: center; gap: 4px; border-bottom: 1px solid var(--border); padding: 6px 0; }
+.note-database-management-list li > button:first-child { flex: 1; min-width: 0; justify-content: flex-start; border: 0; text-align: left; }
+.note-database-management-list strong { overflow: hidden; text-overflow: ellipsis; }
+.note-database-management-list span { margin-left: auto; color: var(--text-muted); font-size: 11px; }
+.note-database-subform { margin-top: 18px; padding-top: 18px; border-top: 1px solid var(--border); }
+.note-database-rule { display: flex; align-items: flex-start; gap: 6px; }
+.note-database-rule > input, .note-database-rule > select { flex: 1; min-width: 0; }
+.note-database-rule > button { flex-shrink: 0; }
+.note-database-column-settings { display: grid; gap: 8px; }
+.note-database-column-settings > div { display: flex; align-items: center; gap: 10px; padding: 7px 0; border-bottom: 1px solid var(--border); }
+.note-database-column-settings strong { min-width: 80px; flex: 1; overflow-wrap: anywhere; }
+.note-database-column-settings label { display: flex; align-items: center; gap: 5px; }
+.note-database-column-settings input[type="number"] { width: 72px; }
+.note-database-record-body { display: grid; gap: 10px; padding-top: 12px; border-top: 1px solid var(--border); }
+@media (max-width: 600px) { .note-database-header, .note-database-toolbar { padding-left: 10px; padding-right: 10px; } .note-database-toolbar input[type="search"] { flex-basis: 100%; order: 1; } .note-database-dialog, .note-database-dialog--wide { width: calc(100vw - 16px); max-height: calc(100dvh - 16px); } .note-database-dialog-body { padding: 12px; max-height: calc(100dvh - 82px); } .note-database-rule { flex-wrap: wrap; } .note-database-rule > input, .note-database-rule > select { flex-basis: 40%; } .note-database-column-settings > div { flex-wrap: wrap; } .note-database-column-settings strong { flex-basis: 100%; } .note-database-management-list span { display: none; } }

@@ -1,0 +1,40 @@
+.company-profile-fields {
+  min-width: 0;
+  margin: 0;
+  padding: 16px;
+  border: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+.company-profile-fields label { display: grid; align-content: start; gap: 6px; color: var(--text-secondary); font-size: 13px; }
+.company-profile-fields input, .company-profile-fields textarea { min-width: 0; width: 100%; }
+.company-profile-fields textarea { resize: vertical; }
+.company-field-wide { grid-column: 1 / -1; }
+.company-field-help { color: var(--text-muted); font-size: 12px; }
+.company-profile-section .admin-notice { margin: 0 16px 12px; }
+.company-form-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; padding: 0 16px 16px; }
+.company-profile-section > .company-form-actions { padding-top: 16px; }
+.project-create-form > .company-create-actions { display: flex; justify-content: flex-end; padding: 12px 16px; gap: 8px; }
+.company-project-type { display: flex; flex-wrap: wrap; gap: 16px; margin: 16px; padding: 0; border: 0; }
+.company-project-type legend { margin-bottom: 8px; color: var(--text-secondary); font-size: 13px; }
+.project-create-form .company-project-type label { display: inline-flex; align-items: center; gap: 8px; }
+.company-project-type input { width: 16px; min-height: 16px; height: 16px; margin: 0; }
+.company-setup-steps { display: flex; gap: 24px; padding: 0 16px; margin: 16px 0; list-style-position: inside; color: var(--text-muted); font-size: 13px; }
+.company-setup-steps [aria-current="step"] { color: var(--text); font-weight: 650; }
+.company-setup-help { padding: 0 16px; color: var(--text-secondary); font-size: 13px; }
+.company-tabs { display: flex; gap: 4px; min-width: 0; overflow-x: auto; border-bottom: 1px solid var(--border); }
+.company-tabs button { flex-shrink: 0; border: 0; border-bottom: 2px solid transparent; border-radius: 0; padding: 10px 12px; background: transparent; color: var(--text-secondary); font-size: 13px; }
+.company-tabs button[aria-selected="true"] { color: var(--text); border-bottom-color: var(--accent); }
+.company-tabs button:hover { background: var(--surface-subtle); }
+.company-tabs button:focus-visible { outline: 2px solid var(--focus); outline-offset: -2px; }
+.company-tab-panel { display: grid; gap: 16px; min-width: 0; }
+.company-tab-panel [hidden] { display: none; }
+.project-gate-create-form > .company-project-type { grid-column: 1 / -1; margin: 0 0 4px; }
+.project-gate-create-form .company-project-type label { display: inline-flex; align-items: center; gap: 8px; }
+.project-gate-create-form > .company-profile-fields { grid-column: 1 / -1; padding: 16px 0 0; border-top: 1px solid var(--border); }
+.content[data-page-width="full"] .projects-page > .project-create-form { max-height: min(72vh, 800px); overflow-y: auto; }
+@media (max-width: 640px) {
+  .company-profile-fields { grid-template-columns: 1fr; padding: 12px; gap: 12px; }
+  .company-tabs button { padding: 10px 8px; }
+}

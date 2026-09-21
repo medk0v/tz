@@ -1,0 +1,9 @@
+.note-database-embeds { display: grid; gap: 20px; min-width: 0; padding: 16px 28px 28px; }
+.note-database-embeds[hidden] { display: none; }
+.note-database-embeds > .notes-button { justify-self: start; }
+.note-database-embeds > p { font-size: 13px; color: var(--text-muted); }
+.note-database-embed { min-width: 0; }
+.note-database-embed-controls { display: flex; gap: 6px; justify-content: flex-end; padding-top: 7px; }
+.note-database-embed-controls button { display: inline-flex; align-items: center; gap: 5px; padding: 4px 7px; background: transparent; border: 1px solid var(--border-color); border-radius: 5px; color: var(--text-muted); font: inherit; font-size: 12px; cursor: pointer; }
+.note-database-embed-controls button:disabled { opacity: .45; cursor: default; }
+@media (max-width: 600px) { .note-database-embeds { padding: 12px; } }

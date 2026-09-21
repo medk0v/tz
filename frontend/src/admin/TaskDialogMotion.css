@@ -1,0 +1,40 @@
+@keyframes task-dialog-enter {
+  from { opacity: 0; transform: var(--task-dialog-offset); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes task-dialog-exit {
+  from { opacity: 1; transform: none; }
+  to { opacity: 0; transform: var(--task-dialog-offset); }
+}
+
+@keyframes task-dialog-backdrop-enter {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes task-dialog-backdrop-exit {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  dialog, [role="dialog"][aria-modal="true"] { --task-dialog-offset: translateY(10px) scale(.98); }
+  .task-drawer { --task-dialog-offset: translateX(32px); }
+
+  dialog[open], [role="dialog"][aria-modal="true"] {
+    animation: task-dialog-enter 240ms cubic-bezier(.2, .75, .25, 1) backwards;
+  }
+
+  dialog[open]::backdrop, .profile-dialog-backdrop, .reply-template-picker-overlay {
+    animation: task-dialog-backdrop-enter 240ms ease-out backwards;
+  }
+
+  dialog[data-task-dialog][open][data-closing] {
+    animation: task-dialog-exit 180ms ease-in both;
+  }
+
+  dialog[data-task-dialog][open][data-closing]::backdrop {
+    animation: task-dialog-backdrop-exit 180ms ease-in both;
+  }
+}

@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+# Runtime only: all images and NuQ schema are already present in the artifact.
+set -euo pipefail
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ENV_FILE="$ROOT_DIR/.env"
+fail() { echo "Lite Firecrawl: $*" >&2; exit 1; }
+compose() {
+    docker compose --project-name tz-firecrawl --project-directory "$ROOT_DIR" \
+        --env-file "$ENV_FILE" -f "$ROOT_DIR/compose.yaml" "$@"
+}
+ready() {
+    local attempt
+    for ((attempt=0; attempt<90; attempt++)); do
+        curl --connect-timeout 2 --max-time 5 -fsS http://127.0.0.1:3002/v0/health/readiness >/dev/null 2>&1 && return 0
+        sleep 2
+    done
+    fail "API did not become ready"
+}
+case "${1:-}" in
+    start)
+        [[ -f "$ENV_FILE" ]] || fail "private runtime environment is missing"
+        docker network inspect tz-ai >/dev/null 2>&1 || docker network create tz-ai >/dev/null
+        compose up --no-build --pull never -d --wait --wait-timeout 180 playwright-service redis rabbitmq nuq-postgres
+        # The schema is embedded in the prebuilt nuq-postgres image.
+        schema="$(printf '%s\n' "SELECT to_regclass('nuq.queue_scrape') IS NOT NULL AND to_regclass('nuq.queue_crawl_finished') IS NOT NULL AND to_regclass('nuq.group_crawl') IS NOT NULL;" \
+            | compose exec -T nuq-postgres sh -eu -c 'psql -X -A -t -q -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB"')"
+        if [[ "$schema" != t ]]; then
+            compose exec -T nuq-postgres sh -eu -c 'psql -X -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" --file /docker-entrypoint-initdb.d/010-nuq.sql' >/dev/null
+        fi
+        compose up --no-build --pull never -d api
+        ready
+        ;;
+    smoke)
+        ready
+        curl --fail-with-body --silent --show-error --max-time 90 \
+            -X POST http://127.0.0.1:3002/v2/scrape -H 'Content-Type: application/json' \
+            -d '{"url":"https://example.com","formats":["markdown"],"timeout":60000}' \
+            | jq -e '.success == true and (.data.markdown | length > 0)' >/dev/null
+        ;;
+    status) compose ps --all ;;
+    stop) compose down ;;
+    *) fail "usage: manage.sh start|smoke|status|stop" ;;
+esac

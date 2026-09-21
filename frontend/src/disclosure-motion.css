@@ -1,0 +1,10 @@
+/* Web Animations own these transitions, including exit; avoid a second CSS entrance. */
+[data-disclosure-motion] { animation: none !important; }
+.shell details[data-disclosure-motion][open] > :not(summary),
+.marketing-faq details[data-disclosure-motion][open] > :not(summary) { animation: none; }
+[data-disclosure-motion][hidden] { display: none !important; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .task-tag-toggle > svg { transition: transform 220ms cubic-bezier(.2, .75, .25, 1); }
+  .task-tag-toggle[aria-expanded="true"] > svg { transform: rotate(90deg); }
+}

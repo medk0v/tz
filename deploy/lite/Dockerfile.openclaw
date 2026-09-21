@@ -1,0 +1,21 @@
+# Builder-only second stage, after infra/openclaw/Dockerfile adds the fixed wrappers.
+ARG OPENCLAW_WRAPPER_IMAGE
+FROM ${OPENCLAW_WRAPPER_IMAGE}
+
+USER root
+RUN mkdir -p /opt/tz-plugin-build /opt/tz-plugins \
+    && chown node:node /opt/tz-plugin-build
+USER node
+# Use the same pinned official installer as the full deployment, only at build time.
+RUN OPENCLAW_STATE_DIR=/opt/tz-plugin-build \
+    OPENCLAW_CONFIG_DIR=/opt/tz-plugin-build \
+    OPENCLAW_CONFIG_PATH=/opt/tz-plugin-build/openclaw.json \
+    node dist/index.js plugins install --pin @openclaw/firecrawl-plugin@2026.7.1
+USER root
+# These /opt paths exist inside the image; the helper is mounted only for this build step.
+RUN --mount=type=bind,source=bake-firecrawl-plugin.mjs,target=/tmp/bake-firecrawl-plugin.mjs \
+    node /tmp/bake-firecrawl-plugin.mjs /opt/tz-plugin-build /opt/tz-plugins/firecrawl \
+    && chown -R root:root /opt/tz-plugins \
+    && chmod -R a+rX,go-w /opt/tz-plugins \
+    && rm -rf /opt/tz-plugin-build
+USER node

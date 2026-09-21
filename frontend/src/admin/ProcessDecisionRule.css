@@ -1,0 +1,4 @@
+.process-decision-rule { min-width: 0; margin: 8px 0 0; padding: 12px 0 0; border: 0; border-top: 1px solid var(--border); display: flex; flex-direction: column; gap: 12px; }
+.process-decision-rule legend { padding: 0 8px 0 0; color: var(--text-secondary); font-size: 13px; }
+.process-decision-rule .process-description { gap: 12px 20px; }
+.process-decision-rule .process-help { margin: 0; }

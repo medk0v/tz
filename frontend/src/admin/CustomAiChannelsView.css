@@ -1,0 +1,97 @@
+.custom-ai-channels-page > .page-toolbar {
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.custom-ai-channels-page .page-toolbar > div {
+  min-width: 0;
+}
+
+.custom-ai-channel-fields {
+  display: grid;
+  gap: 24px;
+  min-width: 0;
+  margin: 0;
+  padding: 24px;
+  border: 0;
+}
+
+.custom-ai-channel-fields label,
+.custom-ai-agent-field {
+  display: grid;
+  min-width: 0;
+  gap: 8px;
+}
+
+.custom-ai-channel-fields input:not([type="radio"]),
+.custom-ai-channel-fields select,
+.custom-ai-channel-fields textarea {
+  width: 100%;
+}
+
+.custom-ai-channel-fields textarea {
+  resize: vertical;
+  min-height: 150px;
+}
+
+.custom-ai-icon-field { border: 0; padding: 0; margin: 0; min-width: 0; }
+.custom-ai-icon-field legend { margin-bottom: 10px; }
+.custom-ai-icon-options { display: flex; gap: 8px; flex-wrap: wrap; }
+.custom-ai-icon-options button { display: grid; place-items: center; width: 40px; height: 40px; border: 1px solid var(--border); border-radius: var(--radius); color: var(--text-secondary); background: var(--surface); cursor: pointer; }
+.custom-ai-icon-options button[aria-pressed="true"] { color: var(--accent); border-color: var(--accent); background: var(--surface-strong); }
+.custom-ai-delete { margin-left: auto; }
+
+.custom-ai-channel-mode {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px 24px;
+  margin: 16px 0 0;
+  padding: 0;
+  border: 0;
+}
+
+.custom-ai-mode-options summary { cursor: pointer; }
+.custom-ai-connection-type { margin: 0; }
+
+.custom-ai-channel-mode legend {
+  margin-bottom: 12px;
+}
+
+.custom-ai-channel-mode label {
+  display: flex;
+  align-items: center;
+}
+
+.custom-ai-channel-mode input[type="radio"] {
+  width: 16px;
+  height: 16px;
+  margin: 0;
+}
+
+.custom-ai-channel-actions,
+.custom-ai-load-error {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.custom-ai-channel-actions {
+  padding: 20px 24px;
+  border-top: 1px solid var(--border);
+}
+
+.custom-ai-channel-editor .admin-notice {
+  margin: 0 24px 20px;
+}
+
+.custom-ai-source-cell {
+  max-width: 320px;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 640px) {
+  .custom-ai-channel-fields { padding: 20px 16px; }
+  .custom-ai-channel-actions { padding: 16px; }
+  .custom-ai-channel-editor .admin-notice { margin-inline: 16px; }
+}

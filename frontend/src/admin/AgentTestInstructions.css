@@ -1,0 +1,32 @@
+.agent-test-sources { display: grid; grid-template-columns: 180px minmax(0, 1fr); gap: 20px; min-width: 0; padding: 16px; }
+.agent-test-sources-unavailable { grid-column: 1 / -1; color: var(--text-secondary); font-size: 13px; line-height: 1.6; }
+.agent-test-sources-navigation { display: flex; flex-direction: column; align-items: stretch; gap: 4px; border-right: 1px solid var(--border); padding-right: 12px; }
+.agent-test-sources-navigation button { display: flex; align-items: flex-start; gap: 8px; padding: 10px 12px; border: 0; border-radius: 6px; background: transparent; color: var(--text-secondary); font: inherit; font-size: 13px; line-height: 1.5; text-align: left; cursor: pointer; }
+.agent-test-sources-navigation button svg { flex: 0 0 auto; margin-top: 2px; }
+.agent-test-sources-navigation button span { min-width: 0; overflow-wrap: anywhere; }
+.agent-test-sources-navigation button small { display: block; font-size: 11px; font-weight: 400; }
+.agent-test-sources-navigation button[aria-selected="true"] { background: var(--surface-subtle); color: var(--text); font-weight: 600; }
+.agent-test-sources-navigation button:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+.agent-test-sources-navigation button:disabled { cursor: wait; opacity: .6; }
+.agent-test-sources-panel, .agent-test-sources-editor { min-width: 0; }
+.agent-test-sources-panel[hidden] { display: none; }
+.agent-test-sources-heading { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 16px; margin-bottom: 16px; }
+.agent-test-sources-heading h4 { margin: 0; font-size: 14px; }
+.agent-test-sources-heading > span, .agent-test-sources-chunk > span { color: var(--text-secondary); font-size: 12px; }
+.agent-test-sources-columns { display: grid; grid-template-columns: minmax(0, 1fr); gap: 20px; }
+.agent-test-sources-columns section { display: flex; flex-direction: column; align-items: stretch; gap: 12px; min-width: 0; }
+.agent-test-sources-columns h5 { margin: 0; font-size: 13px; font-weight: 600; }
+.agent-test-sources .agent-test-sources-hint, .agent-test-sources-hint { color: var(--text-secondary); font-size: 12px; line-height: 1.6; }
+.agent-test-sources pre { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; max-height: 240px; overflow: auto; padding: 12px; border: 1px solid var(--border); border-radius: 6px; background: var(--surface-subtle); color: var(--text); font: inherit; font-size: 13px; line-height: 1.7; }
+.agent-test-sources-chunk { display: grid; gap: 6px; }
+.agent-test-sources-current label { display: flex; flex-direction: column; gap: 6px; font-size: 12px; }
+.agent-test-sources-current textarea { width: 100%; min-height: 250px; padding: 12px; resize: vertical; font: inherit; font-size: 13px; line-height: 1.7; }
+.agent-test-sources-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.agent-test-sources-actions button { font-size: 12px; }
+.agent-test-sources-suggestion { font-size: 12px; }
+.agent-test-sources .agent-test-sources-notice { font-size: 12px; line-height: 1.6; color: var(--success); }
+@container agent-tests (max-width: 700px) {
+  .agent-test-sources { grid-template-columns: minmax(0, 1fr); gap: 16px; }
+  .agent-test-sources-navigation { flex-direction: row; flex-wrap: wrap; border-right: 0; border-bottom: 1px solid var(--border); padding: 0 0 12px; }
+  .agent-test-sources-navigation button { flex: 1 1 150px; }
+}

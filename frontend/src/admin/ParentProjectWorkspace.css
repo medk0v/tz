@@ -1,0 +1,31 @@
+.parent-project-workspace { display: grid; gap: 16px; min-width: 0; }
+.project-scope-slot:empty { display: none; }
+.project-scope-control .preference-dropdown-trigger { height: 30px; font-size: 11px; font-weight: 500; }
+.project-scope-picker .preference-dropdown-options { display: flex; flex-direction: column; }
+.project-scope-picker .preference-dropdown-search,
+.project-scope-picker .project-scope-all { flex-shrink: 0; }
+.project-scope-picker .preference-dropdown-results { min-height: 0; }
+.project-scope-picker .preference-dropdown-option { justify-content: flex-start; }
+.project-scope-picker .preference-dropdown-option:hover { background: var(--surface-subtle); }
+.project-scope-picker .preference-dropdown-option:focus-within { outline: 2px solid var(--accent); outline-offset: -2px; }
+.project-scope-picker .preference-dropdown-option input { flex: 0 0 auto; width: 15px; height: 15px; min-height: 0; margin: 0; padding: 0; accent-color: var(--accent); }
+.project-scope-picker .preference-dropdown-option > span { min-width: 0; overflow-wrap: anywhere; }
+.project-scope-picker .project-scope-all { border-bottom: 1px solid var(--border); border-radius: 0; }
+.project-scope-open { justify-self: start; padding: 0; border: 0; background: transparent; color: inherit; font: inherit; font-size: 11px; text-decoration: underline; cursor: pointer; }
+.parent-project-section { min-width: 0; border-top: 1px solid var(--border); }
+.parent-project-heading { display: flex; align-items: baseline; flex-wrap: wrap; gap: 12px; padding: 16px 0; }
+.parent-project-heading h2 { margin: 0; font-size: 18px; }
+.parent-project-heading > span { color: var(--text-muted); font-size: 12px; }
+.parent-project-heading > button { margin-inline-start: auto; }
+.parent-project-section > .page { max-width: none; padding: 0; }
+.parent-project-section .conversations-page { height: 620px; max-height: 80vh; min-height: 420px; --conversation-wait: #a65b09; }
+.parent-project-section .page-toolbar h1 { font-size: 16px; }
+.content[data-page-width="full"]:has(> .parent-project-workspace) { padding: 0; background: var(--surface); }
+.content[data-page-width="full"] > .parent-project-workspace { gap: 0; }
+.content[data-page-width="full"] .parent-project-section > .conversations-page { max-width: none; }
+.content[data-page-width="full"] .parent-project-heading { padding: 12px 24px; background: var(--surface-subtle); }
+.content[data-page-width="full"] .parent-project-section > .page { display: flex; flex-direction: column; border: 0; border-radius: 0; }
+@media (max-width: 700px) {
+  .content[data-page-width="full"] .parent-project-heading { padding-inline: 14px; }
+  .parent-project-section .conversations-page { height: 75vh; }
+}
