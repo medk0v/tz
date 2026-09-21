@@ -171,8 +171,8 @@ jobs:
           DEPLOY_HOST="$(printf '%s' "${DEPLOY_HOST}" | tr -d '[:space:]')"
           DEPLOY_USER="$(printf '%s' "${DEPLOY_USER}" | tr -d '[:space:]')"
           SSH_HOST_KEY="$(printf '%s' "${SSH_HOST_KEY}" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')"
-          if [ "${DEPLOY_HOST}" != '65.109.95.170' ]; then
-            echo '::error::TZ_LITE_DEPLOY_HOST must hold exactly 65.109.95.170.'
+          if ! printf '%s' "${DEPLOY_HOST}" | grep -Eq '^[A-Za-z0-9]([A-Za-z0-9.-]*[A-Za-z0-9])?$'; then
+            echo '::error::TZ_LITE_DEPLOY_HOST must be a bare host or IP address, with no scheme, port or path.'
             exit 1
           fi
           if [ "${DEPLOY_USER}" != 'tz-deploy' ]; then

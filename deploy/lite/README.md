@@ -6,8 +6,8 @@ in both the UI and API. Departments, roles and their access rules remain availab
 The custom widget opening animation is disabled in Lite; standard widgets retain
 their independent appearance checkbox.
 
-The destination is `65.109.95.170` (Ubuntu 26.04, ARM64). It receives compiled Linux
-binaries, static frontend assets, runtime images and installation configuration.
+The destination is the Lite host named by the `TZ_LITE_DEPLOY_HOST` secret
+(Ubuntu 26.04, ARM64). It receives compiled Linux binaries, static frontend assets, runtime images and installation configuration.
 It never receives the application repository and never compiles the application.
 The standard `Deploy production` workflow and its server helpers are unchanged.
 
@@ -69,7 +69,7 @@ Configure these secrets in the GitHub `lite` environment:
 
 | Secret | Value |
 | --- | --- |
-| `TZ_LITE_DEPLOY_HOST` | `65.109.95.170` |
+| `TZ_LITE_DEPLOY_HOST` | The Lite host's address, as a bare host or IP |
 | `TZ_LITE_DEPLOY_USER` | `tz-deploy` |
 | `TZ_LITE_DEPLOY_SSH_KEY` | A dedicated deployment private key |
 | `TZ_LITE_SSH_HOST_KEY` | The verified server public key, `ssh-ed25519 …`, without hostname/comment |
@@ -113,7 +113,7 @@ instead of creating an empty replacement or rotating persisted credentials.
    default. It refuses to switch a containerd store containing images or
    containers, so an existing installation must be reviewed before switching.
 
-3. Confirm the Cloudflare DNS record targets `65.109.95.170` and HTTP ACME
+3. Confirm the Cloudflare DNS record targets that same Lite host and HTTP ACME
    challenges can reach this origin. Public DNS returns Cloudflare addresses when
    proxying is enabled, so DNS resolution alone cannot verify the origin IP.
    Issue the certificate and enable HTTPS. A contact email is optional:
