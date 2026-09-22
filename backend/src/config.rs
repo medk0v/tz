@@ -75,6 +75,11 @@ impl Config {
             Some(id) if id.is_nil() => bail!("product.project-id must not be nil"),
             Some(_) => {}
         }
+        if let Some(edition) = self.product.edition.as_deref()
+            && edition != "lite"
+        {
+            bail!("product.edition must be \"lite\"; this build serves one workspace");
+        }
         if !(1..=MAX_AI_TASK_CONCURRENCY).contains(&self.worker.ai_task_concurrency) {
             bail!("worker.ai-task-concurrency must be between 1 and {MAX_AI_TASK_CONCURRENCY}");
         }
@@ -215,6 +220,11 @@ pub const REALTIME_CHANNEL: &str = "tz.events";
 #[derive(Clone, Debug, Default, Deserialize)]
 #[serde(default, deny_unknown_fields, rename_all = "kebab-case")]
 pub struct ProductConfig {
+    /// Installations provisioned before the edition split was removed still carry
+    /// `edition = "lite"` in their configuration file, and provisioning preserves
+    /// that file across deployments. This build is always single-project, so the
+    /// key is accepted for those installations and rejected for any other value.
+    pub edition: Option<String>,
     pub project_id: Option<Uuid>,
 }
 
@@ -727,6 +737,21 @@ mod tests {
     use std::path::Path;
 
     const EXAMPLE: &str = include_str!("../Config.example.toml");
+
+    #[test]
+    fn a_provisioned_lite_edition_key_still_loads() {
+        // Installations provisioned before the edition split was removed keep
+        // `edition = "lite"` in a configuration file that provisioning preserves,
+        // so rejecting the key would stop the API from starting on them.
+        let source = EXAMPLE.replace("[product]", "[product]\nedition = \"lite\"");
+        let config: Config = toml::from_str(&source).unwrap();
+        assert_eq!(config.product.edition.as_deref(), Some("lite"));
+        assert!(config.validate().is_ok());
+
+        let other = EXAMPLE.replace("[product]", "[product]\nedition = \"standard\"");
+        let config: Config = toml::from_str(&other).unwrap();
+        assert!(config.validate().is_err());
+    }
 
     #[test]
     fn a_fixed_non_nil_project_is_required() {

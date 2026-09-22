@@ -26,6 +26,7 @@ async fn get(app: Router, path: &str) -> String {
 async fn public_health_and_api_titles_stay_neutral() {
     let mut config: Config = toml::from_str(include_str!("../Config.example.toml")).unwrap();
     config.product = ProductConfig {
+        edition: None,
         project_id: Some(Uuid::now_v7()),
     };
     config.server.allowed_origins = vec!["https://example.com".into()];

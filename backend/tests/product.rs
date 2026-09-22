@@ -16,6 +16,7 @@ use uuid::Uuid;
 fn config(db: &PgPool) -> Config {
     let mut config: Config = toml::from_str(include_str!("../Config.example.toml")).unwrap();
     config.product = ProductConfig {
+        edition: None,
         project_id: Some(Uuid::now_v7()),
     };
     config.pg.url = db.connect_options().to_url_lossy().to_string();

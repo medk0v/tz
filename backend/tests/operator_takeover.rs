@@ -148,6 +148,7 @@ async fn app(db: &PgPool) -> Router {
     config.redis.url = None;
     config.attachments.enabled = false;
     config.product = ProductConfig {
+        edition: None,
         project_id: Some(id(PROJECT)),
     };
     let mut state = AppState::build(config).await.unwrap();
@@ -328,6 +329,7 @@ async fn administrator_generates_ai_reply_drafts_without_joining(db: PgPool) {
         config.attachments.enabled = false;
         config.openclaw.base_url = Some(base_url.clone());
         config.product = ProductConfig {
+            edition: None,
             project_id: Some(id(PROJECT)),
         };
         let mut state = AppState::build(config).await.unwrap();
