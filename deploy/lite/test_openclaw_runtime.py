@@ -224,8 +224,8 @@ class OpenClawRuntimeTests(unittest.TestCase):
             self.assertEqual(compose["services"]["browser-runner"]["network_mode"], "none")
             serialized = json.dumps(compose)
             self.assertNotRegex(serialized, "(?i)tzomet")
-            self.assertEqual(compose["name"], "support-openclaw")
-            self.assertEqual(compose["networks"]["support-ai"]["name"], "support-ai")
+            self.assertEqual(compose["name"], "tz-openclaw")
+            self.assertEqual(compose["networks"]["tz-ai"]["name"], "tz-ai")
             self.assertNotIn(str(runtime.ROOT), serialized)
             self.assertNotIn("Dockerfile", serialized)
 

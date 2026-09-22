@@ -1,5 +1,6 @@
 import json
 from pathlib import Path
+import re
 import shutil
 import subprocess
 import tempfile
@@ -82,6 +83,32 @@ class BakedFirecrawlTests(unittest.TestCase):
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("Expected one installed Firecrawl npm project, found 0", result.stderr)
         self.assertFalse(self.destination.exists())
+
+
+class RuntimeProjectNameTests(unittest.TestCase):
+    """The development helper and the released runtime must name the same Compose
+    project. A one-sided rename orphans the running stack and its named volumes."""
+
+    ROOT = DIRECTORY.parents[1]
+
+    def project_name(self, relative, flag):
+        text = (self.ROOT / relative).read_text()
+        names = re.findall(rf"{flag} ([A-Za-z0-9][A-Za-z0-9_.-]*)", text)
+        self.assertEqual(len(names), 1, f"{relative} must name its project exactly once")
+        return names[0]
+
+    def test_firecrawl_project_name_agrees(self):
+        self.assertEqual(
+            self.project_name("infra/firecrawl/manage.sh", "--project-name"),
+            self.project_name("deploy/lite/firecrawl-runtime", "--project-name"),
+        )
+
+    def test_openclaw_project_and_shared_network(self):
+        compose = (self.ROOT / "infra/openclaw/compose.yaml").read_text()
+        self.assertIn("name: tz-openclaw\n", compose)
+        runtime = (self.ROOT / "deploy/lite/firecrawl-runtime").read_text()
+        for source in (compose, runtime, (self.ROOT / "infra/openclaw/manage.sh").read_text()):
+            self.assertIn("tz-ai", source)
 
 
 if __name__ == "__main__":

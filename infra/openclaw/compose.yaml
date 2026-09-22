@@ -1,4 +1,4 @@
-name: support-openclaw
+name: tz-openclaw
 
 services:
   openclaw-gateway:
@@ -7,7 +7,7 @@ services:
       dockerfile: Dockerfile
       args:
         OPENCLAW_BASE_IMAGE: ${OPENCLAW_IMAGE:?OPENCLAW_IMAGE is required}
-    image: support-openclaw:local
+    image: tz-openclaw:local
     depends_on:
       shell-runner:
         condition: service_healthy
@@ -51,7 +51,7 @@ services:
       - "${OPENCLAW_GRANT_GID:-1000}"
     networks:
       - default
-      - support-ai
+      - tz-ai
     ports:
       - "127.0.0.1:18789:18789"
     cap_drop:
@@ -89,7 +89,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.browser
-    image: support-openclaw-browser:local
+    image: tz-openclaw-browser:local
     user: "1000:1000"
     environment:
       SUPPORT_BROWSER_CONCURRENCY: ${SUPPORT_BROWSER_CONCURRENCY:-2}
@@ -122,7 +122,7 @@ services:
         max-file: "3"
 
   shell-runner:
-    image: support-openclaw:local
+    image: tz-openclaw:local
     user: "0:0"
     environment:
       OPENCLAW_GRANT_GID: ${OPENCLAW_GRANT_GID:-1000}
@@ -175,6 +175,6 @@ volumes:
   browser-runtime:
 
 networks:
-  support-ai:
-    name: support-ai
+  tz-ai:
+    name: tz-ai
     external: true

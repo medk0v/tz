@@ -15,7 +15,7 @@ Start and verify:
 ./infra/firecrawl/manage.sh smoke
 ```
 
-Connect the self-hosted API to OpenClaw through the private `support-ai` Docker
+Connect the self-hosted API to OpenClaw through the private `tz-ai` Docker
 network:
 
 ```bash
@@ -50,7 +50,7 @@ Unused optional upstream integrations are explicitly set to empty values in the
 private `.env`; this keeps Compose output quiet without enabling them.
 
 Production keeps the checked-out pinned source, PostgreSQL volume, and private
-environment under `/var/lib/support-ai/firecrawl`. Updating the versioned release
+environment under `/var/lib/tz-ai/firecrawl`. Updating the versioned release
 files does not delete or recreate that persistent data.
 
 The management script waits until PostgreSQL has completed `initdb`, verifies

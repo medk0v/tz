@@ -302,10 +302,10 @@ None of the containers has a host project mount or Docker socket; the shell and
 browser runners also have no network. Do not expose the Gateway port or token to widget clients or
 the public internet.
 
-Production uses `/srv/support-ai/current` for versioned deployment files and
-`/var/lib/support-ai/openclaw` for the private token and persistent state.
+Production uses `/srv/tz-ai/current` for versioned deployment files and
+`/var/lib/tz-ai/openclaw` for the private token and persistent state.
 Plaintext short-lived grants, action markers, and the shell socket live only in
-host tmpfs under `/run/support-ai/openclaw`, recreated at boot with restrictive
+host tmpfs under `/run/tz-ai/openclaw`, recreated at boot with restrictive
 ownership. The OpenClaw container receives read-only grant access through the
-dedicated `support-openclaw` group and write-only-by-capability access to the
+dedicated `tz-openclaw` group and write-only-by-capability access to the
 separate action directory; neither the token nor runtime state is stored in Git.

@@ -174,9 +174,9 @@ compose() {
 }
 
 ensure_shared_network() {
-  if ! docker network inspect support-ai >/dev/null 2>&1; then
-    docker network create --driver bridge support-ai >/dev/null
-    echo "OpenClaw: created shared Docker network support-ai"
+  if ! docker network inspect tz-ai >/dev/null 2>&1; then
+    docker network create --driver bridge tz-ai >/dev/null
+    echo "OpenClaw: created shared Docker network tz-ai"
   fi
 }
 

@@ -104,15 +104,15 @@ ensure_source() {
 }
 
 ensure_shared_network() {
-  if ! docker network inspect support-ai >/dev/null 2>&1; then
-    docker network create --driver bridge support-ai >/dev/null
-    echo "Firecrawl: created shared Docker network support-ai"
+  if ! docker network inspect tz-ai >/dev/null 2>&1; then
+    docker network create --driver bridge tz-ai >/dev/null
+    echo "Firecrawl: created shared Docker network tz-ai"
   fi
 }
 
 compose() {
   docker compose \
-    --project-name support-firecrawl \
+    --project-name tz-firecrawl \
     --project-directory "$SOURCE_DIR" \
     --env-file "$ENV_FILE" \
     -f "$SOURCE_DIR/docker-compose.yaml" \

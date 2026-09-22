@@ -4,7 +4,7 @@ services:
       - "127.0.0.1:3002:3002"
     networks:
       backend:
-      support-ai:
+      tz-ai:
         aliases:
           - firecrawl-api
     depends_on:
@@ -53,8 +53,8 @@ services:
       retries: 10
 
 networks:
-  support-ai:
-    name: support-ai
+  tz-ai:
+    name: tz-ai
     external: true
 
 volumes:

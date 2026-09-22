@@ -3,7 +3,7 @@ set -euo pipefail
 
 root="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 name="support-browser-test-$$"
-image="support-openclaw-browser:test"
+image="tz-openclaw-browser:test"
 cleanup() {
   local status=$?
   if [[ "$status" -ne 0 ]]; then
