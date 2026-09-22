@@ -50,6 +50,12 @@ def runtime_script(source, commands, gateway_image):
     for function in ("configure_gateway", "build_exec_approvals_file", "verify_support_agent_config", "verify_workspace_policy"):
         if policy.count(f"\n{function}() {{\n") != 1:
             raise ValueError(f"required policy function changed: {function}")
+    # The commands half and the policy half are renamed independently, so catch a
+    # call left pointing at a function that no longer exists before it reaches a server.
+    defined = set(re.findall(r"^([A-Za-z_][A-Za-z0-9_]*)\(\) \{", result, re.M))
+    for call in sorted(set(re.findall(r"^\s+([a-z][a-z0-9]*(?:_[a-z0-9]+)+)\s*$", result, re.M))):
+        if call not in defined:
+            raise ValueError(f"runtime helper calls an undefined function: {call}")
     return result
 
 

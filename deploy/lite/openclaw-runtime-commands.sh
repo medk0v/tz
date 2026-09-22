@@ -108,7 +108,7 @@ case "$command" in
     configure_lite_agent_runtime
     configure_baked_firecrawl
     install_workspace_policy
-    verify_tz_agent_config
+    verify_support_agent_config
     verify_lite_agent_runtime
     verify_baked_firecrawl
     compose up -d --no-build --pull never shell-runner browser-runner openclaw-gateway
@@ -119,9 +119,9 @@ case "$command" in
     ;;
   doctor)
     require_preloaded_images
-    verify_tz_agent_config
+    verify_support_agent_config
     verify_lite_agent_runtime
-    verify_tz_model
+    verify_support_model
     verify_baked_firecrawl
     run_cli_before_gateway doctor --lint --json --severity-min error
     ;;
